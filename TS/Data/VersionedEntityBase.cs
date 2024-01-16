@@ -5,6 +5,6 @@
         public Guid ImmutableId { get; set; }
         public int Version { get; set; }
         public DateTime CreationDate { get; set; }
-        public DateTime DeletionDate { get; set; }
+        public DateTime? DeletionDate { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using TS.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,8 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<TestsContext>(options =>
-    options.UseNpgsql("Host=host.docker.internal;Database=ts;Username=usr;Password=pwd"));
+//builder.Services.AddDbContext<TestsContext>(options =>
+//    options.UseNpgsql("Host=host.docker.internal;Database=ts;Username=usr;Password=pwd"));
+
+//NpgsqlConnection.GlobalTypeMapper.EnableDynamicJson();
+
+// Have to use NpgsqlDataSourceBuilder in order to enable JSON mapping.
+var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;Database=ts;Username=usr;Password=pwd")
+    .EnableDynamicJson();
+var dataSource = dataSourceBuilder.Build();
+builder.Services.AddDbContext<TestsContext>(options => options.UseNpgsql(dataSource));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

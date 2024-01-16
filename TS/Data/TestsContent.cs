@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using TS.DTO;
 
 namespace TS.Data
 {
@@ -7,9 +8,8 @@ namespace TS.Data
         public int Id { get; set; }
         public int TestDescriptionId { get; set; }
         public Guid TestDescriptionImmutableId { get; set; }
-        public TestTypes Type { get; set; }
 
         [Column(TypeName = "jsonb")]
-        public object Tasks { get; set; } = new object();
+        public List<TaskDto> Tasks { get; set; } = new List<TaskDto>();
     }
 }

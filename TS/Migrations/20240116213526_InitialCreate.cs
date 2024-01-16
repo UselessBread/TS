@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using TS.DTO;
 
 #nullable disable
 
@@ -21,7 +22,7 @@ namespace TS.Migrations
                     ImmutableId = table.Column<Guid>(type: "uuid", nullable: false),
                     Version = table.Column<int>(type: "integer", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    DeletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -36,12 +37,11 @@ namespace TS.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TestDescriptionId = table.Column<int>(type: "integer", nullable: false),
                     TestDescriptionImmutableId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    Tasks = table.Column<object>(type: "jsonb", nullable: false),
+                    Tasks = table.Column<List<TaskDto>>(type: "jsonb", nullable: false),
                     ImmutableId = table.Column<Guid>(type: "uuid", nullable: false),
                     Version = table.Column<int>(type: "integer", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    DeletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
