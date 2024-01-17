@@ -17,10 +17,6 @@ namespace TS.Controllers
             _context = context;
         }
 
-        //[HttpGet("hello")]
-        //public async Task<string> Hello() =>
-        //    "hello";
-
         [HttpPost("create")]
         public async Task CreateNewTest(CreateNewTestDto dto)
         {
@@ -61,6 +57,12 @@ namespace TS.Controllers
         public async Task<List<TestDescriptions>> GetAllDescriptions()
         {
             return _context.TestDescriptions.Where(d => d.DeletionDate == null).OrderBy(d => d.Id).ToList();
+        }
+
+        [HttpGet("content")]
+        public async Task<TestsContent> GetTestContentByDescriptionsId([FromQuery]Guid testDescriptionImmutableId)
+        {
+            return _context.TestsContent.OrderBy(c => c.Id).Last(c => c.TestDescriptionImmutableId == testDescriptionImmutableId);
         }
     }
 }
