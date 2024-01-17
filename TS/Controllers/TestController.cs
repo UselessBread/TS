@@ -54,5 +54,13 @@ namespace TS.Controllers
             _context.TestsContent.Add(testsContent);
             await _context.SaveChangesAsync();
         }
+
+
+        //TODO: Use Pagination
+        [HttpGet("descriptions")]
+        public async Task<List<TestDescriptions>> GetAllDescriptions()
+        {
+            return _context.TestDescriptions.Where(d => d.DeletionDate == null).OrderBy(d => d.Id).ToList();
+        }
     }
 }
