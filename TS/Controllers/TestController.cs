@@ -94,10 +94,10 @@ namespace TS.Controllers
             {
                 Tasks = dto.Tasks,
                 CreationDate = creatonTime,
-                ImmutableId = Guid.NewGuid(),
+                ImmutableId = dto.TestContentImmutableId,
                 TestDescriptionImmutableId = createdDescr.ImmutableId,
                 TestDescriptionId = res,
-                Version = 1,
+                Version = existingContent.Version + 1,
             };
 
             _context.TestsContent.Add(createdContent);
