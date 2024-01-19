@@ -20,16 +20,13 @@ namespace TS.Controllers
         [HttpPost("create")]
         public async Task CreateNewTest(CreateNewTestDto dto)
         {
-            if (dto.TestName == null || dto.Tasks == null)
-                throw new Exception();
-
-            DateTime creatonTame = DateTime.Now.ToUniversalTime();
+            DateTime creatonTime = DateTime.Now.ToUniversalTime();
 
             TestDescriptions testDescription = new TestDescriptions
             {
                 Name = dto.TestName,
                 ImmutableId = Guid.NewGuid(),
-                CreationDate = creatonTame,
+                CreationDate = creatonTime,
                 Version = 1,
             };
 
@@ -40,7 +37,7 @@ namespace TS.Controllers
             TestsContent testsContent = new TestsContent()
             {
                 Tasks = dto.Tasks,
-                CreationDate = creatonTame,
+                CreationDate = creatonTime,
                 ImmutableId = Guid.NewGuid(),
                 TestDescriptionImmutableId = testDescription.ImmutableId,
                 TestDescriptionId = res,
@@ -51,7 +48,6 @@ namespace TS.Controllers
             await _context.SaveChangesAsync();
         }
 
-
         //TODO: Use Pagination
         [HttpGet("descriptions")]
         public async Task<List<TestDescriptions>> GetAllDescriptions()
@@ -60,9 +56,52 @@ namespace TS.Controllers
         }
 
         [HttpGet("content")]
-        public async Task<TestsContent> GetTestContentByDescriptionsId([FromQuery]Guid testDescriptionImmutableId)
+        public async Task<TestsContent> GetTestContentByDescriptionsId([FromQuery] Guid testDescriptionImmutableId)
         {
             return _context.TestsContent.OrderBy(c => c.Id).Last(c => c.TestDescriptionImmutableId == testDescriptionImmutableId);
+        }
+
+        [HttpPost("update")]
+        public async Task Update(UpdateTestDto dto)
+        {
+            DateTime creatonTime = DateTime.Now.ToUniversalTime();
+            TestDescriptions existingDescription = _context.TestDescriptions.FirstOrDefault(d => d.ImmutableId == dto.TestDescriptionImmutableId
+            && d.DeletionDate == null) ?? throw new Exception();
+
+            TestsContent existingContent = _context.TestsContent.FirstOrDefault(d => d.ImmutableId == dto.TestContentImmutableId &&
+            d.DeletionDate == null) ?? throw new Exception();
+
+            existingDescription.DeletionDate = creatonTime;
+            var updatedDescr = _context.TestDescriptions.Update(existingDescription);
+
+            existingContent.DeletionDate = creatonTime;
+            _context.TestsContent.Update(existingContent);
+
+            TestDescriptions createdDescr = new TestDescriptions
+            {
+                CreationDate = creatonTime,
+                ImmutableId = dto.TestDescriptionImmutableId,
+                Name = dto.TestName,
+                Version = existingDescription.Version + 1
+            };
+            _context.TestDescriptions.Add(createdDescr);
+            await _context.SaveChangesAsync();
+
+            int res = _context.TestDescriptions.First(descr => descr.ImmutableId == dto.TestDescriptionImmutableId &&
+            descr.DeletionDate == null).Id;
+
+            TestsContent createdContent = new TestsContent()
+            {
+                Tasks = dto.Tasks,
+                CreationDate = creatonTime,
+                ImmutableId = Guid.NewGuid(),
+                TestDescriptionImmutableId = createdDescr.ImmutableId,
+                TestDescriptionId = res,
+                Version = 1,
+            };
+
+            _context.TestsContent.Add(createdContent);
+            await _context.SaveChangesAsync();
         }
     }
 }
