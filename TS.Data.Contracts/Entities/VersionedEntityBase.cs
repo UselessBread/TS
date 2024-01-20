@@ -1,4 +1,4 @@
-﻿namespace TS.Data
+﻿namespace TS.Data.Contracts.Entities
 {
     public class VersionedEntityBase
     {

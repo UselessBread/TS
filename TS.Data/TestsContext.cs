@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TS.Data.Contracts.Entities;
 
 namespace TS.Data
 {

@@ -1,4 +1,6 @@
-﻿namespace TS.DTO
+﻿using TS.Data.Contracts.Constants;
+
+namespace TS.Data.Contracts.DTO
 {
     public class TaskDto
     {

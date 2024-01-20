@@ -1,13 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using TS.DTO;
+using TS.Data.Contracts.DTO;
 
-namespace TS.Data
+namespace TS.Data.Contracts.Entities
 {
     public class TestsContent : VersionedEntityBase
     {
         public int Id { get; set; }
-        public int TestDescriptionId { get; set; }
-        public Guid TestDescriptionImmutableId { get; set; }
 
         [Column(TypeName = "jsonb")]
         public List<TaskDto> Tasks { get; set; } = new List<TaskDto>();

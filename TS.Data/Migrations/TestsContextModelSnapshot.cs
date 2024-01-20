@@ -3,22 +3,19 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TS.DTO;
 using TS.Data;
+using TS.Data.Contracts.DTO;
 
 #nullable disable
 
-namespace TS.Migrations
+namespace TS.Data.Migrations
 {
     [DbContext(typeof(TestsContext))]
-    [Migration("20240116213526_InitialCreate")]
-    partial class InitialCreate
+    partial class TestsContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,7 +24,7 @@ namespace TS.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TS.Data.TestDescriptions", b =>
+            modelBuilder.Entity("TS.Data.Contracts.Entities.TestDescriptions", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,6 +45,12 @@ namespace TS.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("TestContentId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TestContentImmutableId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Version")
                         .HasColumnType("integer");
 
@@ -56,7 +59,7 @@ namespace TS.Migrations
                     b.ToTable("TestDescriptions");
                 });
 
-            modelBuilder.Entity("TS.Data.TestsContent", b =>
+            modelBuilder.Entity("TS.Data.Contracts.Entities.TestsContent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,12 +79,6 @@ namespace TS.Migrations
                     b.Property<List<TaskDto>>("Tasks")
                         .IsRequired()
                         .HasColumnType("jsonb");
-
-                    b.Property<int>("TestDescriptionId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("TestDescriptionImmutableId")
-                        .HasColumnType("uuid");
 
                     b.Property<int>("Version")
                         .HasColumnType("integer");

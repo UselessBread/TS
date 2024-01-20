@@ -1,4 +1,4 @@
-﻿namespace TS.DTO
+﻿namespace TS.Data.Contracts.DTO
 {
     public class CreateNewTestDto
     {

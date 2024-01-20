@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TS.Data;
-using TS.DTO;
+using TS.Data.Contracts.DTO;
+using TS.Data.Contracts.Entities;
+using TS.Data.Repositories;
 
 namespace TS.Controllers
 {
@@ -9,99 +10,37 @@ namespace TS.Controllers
     public class TestController : Controller
     {
         private readonly ILogger<TestController> _logger;
-        private readonly TestsContext _context;
+        private readonly ITestsRepository _testsRepository;
 
-        public TestController(ILogger<TestController> logger, TestsContext context)
+        public TestController(ILogger<TestController> logger, ITestsRepository testsRepository)
         {
             _logger = logger;
-            _context = context;
+            _testsRepository = testsRepository;
         }
 
         [HttpPost("create")]
         public async Task CreateNewTest(CreateNewTestDto dto)
         {
-            DateTime creatonTime = DateTime.Now.ToUniversalTime();
-
-            TestDescriptions testDescription = new TestDescriptions
-            {
-                Name = dto.TestName,
-                ImmutableId = Guid.NewGuid(),
-                CreationDate = creatonTime,
-                Version = 1,
-            };
-
-            _context.TestDescriptions.Add(testDescription);
-            await _context.SaveChangesAsync();
-
-            int res = _context.TestDescriptions.First(descr => descr.ImmutableId == testDescription.ImmutableId).Id;
-            TestsContent testsContent = new TestsContent()
-            {
-                Tasks = dto.Tasks,
-                CreationDate = creatonTime,
-                ImmutableId = Guid.NewGuid(),
-                TestDescriptionImmutableId = testDescription.ImmutableId,
-                TestDescriptionId = res,
-                Version = 1,
-            };
-
-            _context.TestsContent.Add(testsContent);
-            await _context.SaveChangesAsync();
+            await _testsRepository.CreateNewTest(dto);
         }
 
         //TODO: Use Pagination
         [HttpGet("descriptions")]
         public async Task<List<TestDescriptions>> GetAllDescriptions()
         {
-            return _context.TestDescriptions.Where(d => d.DeletionDate == null).OrderBy(d => d.Id).ToList();
+            return await _testsRepository.GetAllDescriptions();
         }
 
         [HttpGet("content")]
         public async Task<TestsContent> GetTestContentByDescriptionsId([FromQuery] Guid testDescriptionImmutableId)
         {
-            return _context.TestsContent.OrderBy(c => c.Id).Last(c => c.TestDescriptionImmutableId == testDescriptionImmutableId);
+            return await _testsRepository.GetTestContentByDescriptionsId(testDescriptionImmutableId);
         }
 
         [HttpPost("update")]
         public async Task Update(UpdateTestDto dto)
         {
-            DateTime creatonTime = DateTime.Now.ToUniversalTime();
-            TestDescriptions existingDescription = _context.TestDescriptions.FirstOrDefault(d => d.ImmutableId == dto.TestDescriptionImmutableId
-            && d.DeletionDate == null) ?? throw new Exception();
-
-            TestsContent existingContent = _context.TestsContent.FirstOrDefault(d => d.ImmutableId == dto.TestContentImmutableId &&
-            d.DeletionDate == null) ?? throw new Exception();
-
-            existingDescription.DeletionDate = creatonTime;
-            var updatedDescr = _context.TestDescriptions.Update(existingDescription);
-
-            existingContent.DeletionDate = creatonTime;
-            _context.TestsContent.Update(existingContent);
-
-            TestDescriptions createdDescr = new TestDescriptions
-            {
-                CreationDate = creatonTime,
-                ImmutableId = dto.TestDescriptionImmutableId,
-                Name = dto.TestName,
-                Version = existingDescription.Version + 1
-            };
-            _context.TestDescriptions.Add(createdDescr);
-            await _context.SaveChangesAsync();
-
-            int res = _context.TestDescriptions.First(descr => descr.ImmutableId == dto.TestDescriptionImmutableId &&
-            descr.DeletionDate == null).Id;
-
-            TestsContent createdContent = new TestsContent()
-            {
-                Tasks = dto.Tasks,
-                CreationDate = creatonTime,
-                ImmutableId = dto.TestContentImmutableId,
-                TestDescriptionImmutableId = createdDescr.ImmutableId,
-                TestDescriptionId = res,
-                Version = existingContent.Version + 1,
-            };
-
-            _context.TestsContent.Add(createdContent);
-            await _context.SaveChangesAsync();
+            await _testsRepository.Update(dto);
         }
     }
 }
