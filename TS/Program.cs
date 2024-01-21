@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using System.Text;
 using TS.Data;
 using TS.Data.Repositories;
 
@@ -15,6 +18,22 @@ var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;D
 var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<TestsContext>(options => options.UseNpgsql(dataSource));
 builder.Services.AddScoped<ITestsRepository, TestsRepository>();
+
+//JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        //ValidAudiences = new List<string> { "http://localhost:10002", "http://localhost:10001" },
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

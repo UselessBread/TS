@@ -46,6 +46,26 @@ namespace IdentityService.Data.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "02FE34E6-D974-439A-AD6B-032DDC1CDD47",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "5C24F991-CBC7-43C8-BBC6-F51AB6DFBD22",
+                            Name = "Teacher",
+                            NormalizedName = "TEACHER"
+                        },
+                        new
+                        {
+                            Id = "3BAE9791-3BAF-4C97-9E69-AF551E65F309",
+                            Name = "Student",
+                            NormalizedName = "STUDENT"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -135,6 +155,56 @@ namespace IdentityService.Data.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "7317BB72-7732-48F5-A34F-6110D503578D",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "f3d1315d-55ce-4dad-a6c9-e74d36bb453a",
+                            Email = "admin@gmail.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@GMAIL.COM",
+                            NormalizedUserName = "DEFAULTADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPnl6bE7tpKqxyPlJTESkXC3vTgHyrYA0L3ZkB5Tgh8ZAQZ0TnUFxTM36gBYlvnyIg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "b097c630-3635-4f7b-bc80-d52e966ef1c8",
+                            TwoFactorEnabled = false,
+                            UserName = "DefaultAdmin"
+                        },
+                        new
+                        {
+                            Id = "2A6EE01C-E688-456B-A469-AF63AEB0CE8E",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "6280c384-fce7-42f0-b682-3641ed053868",
+                            Email = "teach@gmail.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "TEACH@GMAIL.COM",
+                            NormalizedUserName = "DEFAULTTEACH",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH3n+a++azy7SYd4ZSE7O+OFUtQKMXxkefus/lMd+YtGiXrD9dtsw3bhBvhviNo4Ww==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "69a1334a-6b40-4397-9b10-7a86daa9d664",
+                            TwoFactorEnabled = false,
+                            UserName = "DefaultTeach"
+                        },
+                        new
+                        {
+                            Id = "27C53444-1DC6-4CFF-B6AF-5FAF5A7C7722",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "9d8dd135-fe91-44b1-ab94-ae641931ca81",
+                            Email = "stud@gmail.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "TEACH@GMAIL.COM",
+                            NormalizedUserName = "DEFAULTSTUDENT",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKBXtq8k+JD84YYKhCvqAWMtWbri8GG2INOSOaRLUNmvmnRm7dzVRnEY1gzetWETpg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "146323a0-c715-48c3-953f-6e15c8d69194",
+                            TwoFactorEnabled = false,
+                            UserName = "DefaultStudent"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -197,6 +267,23 @@ namespace IdentityService.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "7317BB72-7732-48F5-A34F-6110D503578D",
+                            RoleId = "02FE34E6-D974-439A-AD6B-032DDC1CDD47"
+                        },
+                        new
+                        {
+                            UserId = "2A6EE01C-E688-456B-A469-AF63AEB0CE8E",
+                            RoleId = "5C24F991-CBC7-43C8-BBC6-F51AB6DFBD22"
+                        },
+                        new
+                        {
+                            UserId = "27C53444-1DC6-4CFF-B6AF-5FAF5A7C7722",
+                            RoleId = "3BAE9791-3BAF-4C97-9E69-AF551E65F309"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TS.Data.Contracts.DTO;
 using TS.Data.Contracts.Entities;
 using TS.Data.Repositories;
@@ -25,6 +26,7 @@ namespace TS.Controllers
         }
 
         //TODO: Use Pagination
+        [Authorize(Roles = "Admin")]
         [HttpGet("descriptions")]
         public async Task<List<TestDescriptions>> GetAllDescriptions()
         {

@@ -4,6 +4,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace IdentityService.Data.Migrations
 {
     /// <inheritdoc />
@@ -155,6 +157,36 @@ namespace IdentityService.Data.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "02FE34E6-D974-439A-AD6B-032DDC1CDD47", null, "Admin", "ADMIN" },
+                    { "3BAE9791-3BAF-4C97-9E69-AF551E65F309", null, "Student", "STUDENT" },
+                    { "5C24F991-CBC7-43C8-BBC6-F51AB6DFBD22", null, "Teacher", "TEACHER" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { "27C53444-1DC6-4CFF-B6AF-5FAF5A7C7722", 0, "9d8dd135-fe91-44b1-ab94-ae641931ca81", "stud@gmail.com", false, false, null, "TEACH@GMAIL.COM", "DEFAULTSTUDENT", "AQAAAAIAAYagAAAAEKBXtq8k+JD84YYKhCvqAWMtWbri8GG2INOSOaRLUNmvmnRm7dzVRnEY1gzetWETpg==", null, false, "146323a0-c715-48c3-953f-6e15c8d69194", false, "DefaultStudent" },
+                    { "2A6EE01C-E688-456B-A469-AF63AEB0CE8E", 0, "6280c384-fce7-42f0-b682-3641ed053868", "teach@gmail.com", false, false, null, "TEACH@GMAIL.COM", "DEFAULTTEACH", "AQAAAAIAAYagAAAAEH3n+a++azy7SYd4ZSE7O+OFUtQKMXxkefus/lMd+YtGiXrD9dtsw3bhBvhviNo4Ww==", null, false, "69a1334a-6b40-4397-9b10-7a86daa9d664", false, "DefaultTeach" },
+                    { "7317BB72-7732-48F5-A34F-6110D503578D", 0, "f3d1315d-55ce-4dad-a6c9-e74d36bb453a", "admin@gmail.com", false, false, null, "ADMIN@GMAIL.COM", "DEFAULTADMIN", "AQAAAAIAAYagAAAAEPnl6bE7tpKqxyPlJTESkXC3vTgHyrYA0L3ZkB5Tgh8ZAQZ0TnUFxTM36gBYlvnyIg==", null, false, "b097c630-3635-4f7b-bc80-d52e966ef1c8", false, "DefaultAdmin" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { "3BAE9791-3BAF-4C97-9E69-AF551E65F309", "27C53444-1DC6-4CFF-B6AF-5FAF5A7C7722" },
+                    { "5C24F991-CBC7-43C8-BBC6-F51AB6DFBD22", "2A6EE01C-E688-456B-A469-AF63AEB0CE8E" },
+                    { "02FE34E6-D974-439A-AD6B-032DDC1CDD47", "7317BB72-7732-48F5-A34F-6110D503578D" }
                 });
 
             migrationBuilder.CreateIndex(
