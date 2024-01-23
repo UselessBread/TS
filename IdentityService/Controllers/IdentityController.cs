@@ -28,9 +28,6 @@ namespace IdentityService.Controllers
             _config = config;
         }
 
-        [HttpGet("hello")]
-        public string Hello() => "hello";
-
         [Authorize(Roles = "Admin")]
         [HttpPost("create")]
         public async Task CreatuUser([FromBody] CreateUserRequestDto request)
@@ -79,7 +76,8 @@ namespace IdentityService.Controllers
             if (!res.Succeeded)
                 throw new AuthException("No match");
 
-            IdentityUser user = await _userManager.FindByNameAsync(dto.UserName) ?? throw new Exception();
+            IdentityUser user = await _userManager.FindByNameAsync(dto.UserName) 
+                ?? throw new EntityNotFoundException("No such user was found");
             IList<string> roles = await _userManager.GetRolesAsync(user);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -95,7 +93,7 @@ namespace IdentityService.Controllers
             return new SignInResponseDto
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
-                UserName = user.UserName,
+                UserName = user.UserName ?? throw new InvelidDataException("UserName cannot be null"),
                 Role = roles.First()
             };
         }

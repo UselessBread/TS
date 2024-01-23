@@ -9,9 +9,6 @@ namespace Common.Web
         private readonly RequestDelegate _next;
         private readonly ILogger<ErrorHandlingMiddleware> _logger;
 
-        /// <summary>
-        /// Ctor.
-        /// </summary>
         public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
         {
             _next = next;
@@ -33,8 +30,8 @@ namespace Common.Web
                 }
                 _logger.LogError(innermost, "Unhandled exception");
 
-                ExceptionReturnMessage exceptionMessage = innermost is VerbalizedException structuredException
-                                   ? structuredException.ToExceptionMessage()
+                ExceptionReturnMessage exceptionMessage = innermost is VerbalizedException verbalaizedException
+                                   ? verbalaizedException.ToExceptionMessage()
                                    : new ExceptionReturnMessage(Constants.ErrorCodes.UnhandledError, innermost.Message);
 
                 context.Response.ContentType = ContentType.Json;

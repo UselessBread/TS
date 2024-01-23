@@ -1,4 +1,5 @@
-﻿using TS.Data.Contracts.DTO;
+﻿using Common.Exceptions;
+using TS.Data.Contracts.DTO;
 using TS.Data.Contracts.Entities;
 
 namespace TS.Data.Repositories
@@ -35,7 +36,9 @@ namespace TS.Data.Repositories
             _context.TestsContent.Add(testsContent);
             await _context.SaveChangesAsync();
 
-            int createdContentId = _context.TestsContent.First(descr => descr.ImmutableId == testsContent.ImmutableId).Id;
+            var foundContent = _context.TestsContent.FirstOrDefault(cont => cont.ImmutableId == testsContent.ImmutableId) ??
+                throw new EntityNotFoundException($"No testContent with ImmutableId = {testsContent.ImmutableId} was found");
+            int createdContentId = foundContent.Id;
             TestDescriptions testDescription = new TestDescriptions
             {
                 Name = dto.TestName,
@@ -58,8 +61,9 @@ namespace TS.Data.Repositories
         //TODO: Get content directly by content ID
         public async Task<TestsContent> GetTestContentByDescriptionsId(Guid testDescriptionImmutableId)
         {
-            var res = _context.TestDescriptions.FirstOrDefault(d=>d.ImmutableId == testDescriptionImmutableId && d.DeletionDate == null)
-                ?? throw new Exception();
+            var res = _context.TestDescriptions.FirstOrDefault(d=>d.ImmutableId == testDescriptionImmutableId && d.DeletionDate == null) ??
+                throw new EntityNotFoundException($"No testContent with ImmutableId = {testDescriptionImmutableId} was found");
+
             return _context.TestsContent.OrderBy(c => c.Id).Last(c => c.ImmutableId == res.TestContentImmutableId);
         }
 
@@ -67,10 +71,12 @@ namespace TS.Data.Repositories
         {
             DateTime creatonTime = DateTime.Now.ToUniversalTime();
             TestDescriptions existingDescription = _context.TestDescriptions.FirstOrDefault(d => d.ImmutableId == dto.TestDescriptionImmutableId
-            && d.DeletionDate == null) ?? throw new Exception();
+                && d.DeletionDate == null) ??
+                    throw new EntityNotFoundException($"No testDescription with ImmutableId = {dto.TestDescriptionImmutableId} was found");
 
             TestsContent existingContent = _context.TestsContent.FirstOrDefault(d => d.ImmutableId == dto.TestContentImmutableId &&
-            d.DeletionDate == null) ?? throw new Exception();
+                d.DeletionDate == null) ??
+                    throw new EntityNotFoundException($"No testContent with ImmutableId = {dto.TestContentImmutableId} was found");
 
             existingDescription.DeletionDate = creatonTime;
             var updatedDescr = _context.TestDescriptions.Update(existingDescription);
@@ -89,8 +95,10 @@ namespace TS.Data.Repositories
             _context.TestsContent.Add(createdContent);
             await _context.SaveChangesAsync();
 
-            int res = _context.TestsContent.First(cont => cont.ImmutableId == dto.TestContentImmutableId &&
-            cont.DeletionDate == null).Id;
+            var foundContent = _context.TestsContent.FirstOrDefault(cont => cont.ImmutableId == dto.TestContentImmutableId &&
+            cont.DeletionDate == null) ??
+                throw new EntityNotFoundException($"No testContent with ImmutableId = {dto.TestContentImmutableId} was found");
+            int res = foundContent.Id;
 
             TestDescriptions createdDescr = new TestDescriptions
             {
