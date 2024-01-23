@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CommonModules\Common.Web.csproj" />
     <ProjectReference Include="..\TS.Data\TS.Data.csproj" />
   </ItemGroup>
 

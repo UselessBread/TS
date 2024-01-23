@@ -19,6 +19,7 @@ namespace TS.Controllers
             _testsRepository = testsRepository;
         }
 
+        [Authorize (Roles = "Admin, Teacher")]
         [HttpPost("create")]
         public async Task CreateNewTest(CreateNewTestDto dto)
         {
@@ -39,6 +40,7 @@ namespace TS.Controllers
             return await _testsRepository.GetTestContentByDescriptionsId(testDescriptionImmutableId);
         }
 
+        [Authorize(Roles = "Admin, Teacher")]
         [HttpPost("update")]
         public async Task Update(UpdateTestDto dto)
         {

@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Common.Exceptions;
 
 namespace IdentityService.Controllers
 {
@@ -72,11 +73,11 @@ namespace IdentityService.Controllers
 
         [AllowAnonymous]
         [HttpPost("signin")]
-        public async Task<string> SignIn([FromBody] SignInDto dto)
+        public async Task<SignInResponseDto> SignIn([FromBody] SignInDto dto)
         {
             Microsoft.AspNetCore.Identity.SignInResult res = await _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, false, false);
             if (!res.Succeeded)
-                throw new Exception();
+                throw new AuthException("No match");
 
             IdentityUser user = await _userManager.FindByNameAsync(dto.UserName) ?? throw new Exception();
             IList<string> roles = await _userManager.GetRolesAsync(user);
@@ -91,17 +92,12 @@ namespace IdentityService.Controllers
                                              DateTime.Now.AddDays(1),
                                              credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new SignInResponseDto
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                UserName = user.UserName,
+                Role = roles.First()
+            };
         }
-
-        //[AllowAnonymous]
-        //[HttpPost("signin")]
-        //public async Task SignIn([FromBody]SignInDto dto)
-        //{
-        //    var isSignedIn = _signInManager.IsSignedIn(User);
-        //    Microsoft.AspNetCore.Identity.SignInResult res = await _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, false, false);
-        //    if (!res.Succeeded)
-        //        throw new Exception();
-        //}
     }
 }

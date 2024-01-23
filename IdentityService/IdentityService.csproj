@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CommonModules\Common.Web.csproj" />
     <ProjectReference Include="..\IdentityService.Data.Contracts\IdentityService.Data.Contracts.csproj" />
     <ProjectReference Include="..\IdentityService.Data\IdentityService.Data.csproj" />
   </ItemGroup>
