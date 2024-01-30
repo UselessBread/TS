@@ -56,7 +56,7 @@ namespace TS.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TestDescriptions");
+                    b.ToTable("TestDescriptions", (string)null);
                 });
 
             modelBuilder.Entity("TS.Data.Contracts.Entities.TestsContent", b =>
@@ -85,7 +85,7 @@ namespace TS.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TestsContent");
+                    b.ToTable("TestsContent", (string)null);
                 });
 #pragma warning restore 612, 618
         }

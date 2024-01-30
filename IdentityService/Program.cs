@@ -1,5 +1,6 @@
 using Common.Web;
 using IdentityService.Data;
+using IdentityService.Data.Contracts.Entities;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +21,7 @@ var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;D
 var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<UsersContext>(options => options.UseNpgsql(dataSource));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(identity =>
+builder.Services.AddIdentity<TsUser, IdentityRole<Guid>>(identity =>
         {
             identity.Password.RequiredLength = 1;
             identity.Password.RequireNonAlphanumeric = false;
@@ -63,9 +64,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-//app.MapIdentityApi<IdentityUser>();
-
 
 app.UseHttpsRedirection();
 

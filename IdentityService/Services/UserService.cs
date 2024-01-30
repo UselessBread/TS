@@ -1,6 +1,7 @@
 ﻿using Common.Constants;
 using Common.Exceptions;
 using IdentityService.Data.Contracts.DTO;
+using IdentityService.Data.Contracts.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,11 +19,11 @@ namespace IdentityService.Services
 
     public class UserService : IUserService
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<TsUser> _userManager;
+        private readonly SignInManager<TsUser> _signInManager;
         private readonly IConfiguration _config;
 
-        public UserService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration config)
+        public UserService(UserManager<TsUser> userManager, SignInManager<TsUser> signInManager, IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -31,7 +32,7 @@ namespace IdentityService.Services
 
         public async Task CreateUser(CreateUserRequestDto request)
         {
-            IdentityResult res = await _userManager.CreateAsync(new IdentityUser
+            IdentityResult res = await _userManager.CreateAsync(new TsUser
             {
                 UserName = request.UserName,
                 Email = request.Email,
@@ -39,7 +40,7 @@ namespace IdentityService.Services
             request.Password);
             CheckIdentityResult(res);
 
-            IdentityUser? createdUser = await _userManager.FindByNameAsync(request.UserName);
+            TsUser? createdUser = await _userManager.FindByNameAsync(request.UserName);
             if (createdUser == null)
             {
                 throw new BadRequestException("User was not created");
@@ -69,7 +70,7 @@ namespace IdentityService.Services
             if (!res.Succeeded)
                 throw new AuthException("No match");
 
-            IdentityUser user = await _userManager.FindByNameAsync(dto.UserName)
+            TsUser user = await _userManager.FindByNameAsync(dto.UserName)
                 ?? throw new EntityNotFoundException("No such user was found");
 
             IList<string> roles = await _userManager.GetRolesAsync(user);

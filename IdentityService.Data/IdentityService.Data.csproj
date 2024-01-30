@@ -12,7 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\" />
     <Folder Include="Repositories\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityService.Data.Contracts\IdentityService.Data.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

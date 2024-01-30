@@ -1,4 +1,6 @@
-﻿namespace TS.Data.Contracts.Entities
+﻿using Common.Entities;
+
+namespace TS.Data.Contracts.Entities
 {
     public class TestDescriptions : VersionedEntityBase
     {

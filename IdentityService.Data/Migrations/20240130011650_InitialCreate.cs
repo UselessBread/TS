@@ -18,7 +18,7 @@ namespace IdentityService.Data.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
@@ -32,7 +32,9 @@ namespace IdentityService.Data.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Surname = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -54,12 +56,48 @@ namespace IdentityService.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    TeacherId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ImmutableId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Version = table.Column<int>(type: "integer", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentsByGroups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    GroupImmutableId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StuedntId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ImmutableId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Version = table.Column<int>(type: "integer", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentsByGroups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoleId = table.Column<string>(type: "text", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -80,7 +118,7 @@ namespace IdentityService.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -102,7 +140,7 @@ namespace IdentityService.Data.Migrations
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "text", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -119,8 +157,8 @@ namespace IdentityService.Data.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    RoleId = table.Column<string>(type: "text", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -143,7 +181,7 @@ namespace IdentityService.Data.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
@@ -164,19 +202,19 @@ namespace IdentityService.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "02FE34E6-D974-439A-AD6B-032DDC1CDD47", null, "Admin", "ADMIN" },
-                    { "3BAE9791-3BAF-4C97-9E69-AF551E65F309", null, "Student", "STUDENT" },
-                    { "5C24F991-CBC7-43C8-BBC6-F51AB6DFBD22", null, "Teacher", "TEACHER" }
+                    { new Guid("02fe34e6-d974-439a-ad6b-032ddc1cdd47"), null, "Admin", "ADMIN" },
+                    { new Guid("3bae9791-3baf-4c97-9e69-af551e65f309"), null, "Student", "STUDENT" },
+                    { new Guid("5c24f991-cbc7-43c8-bbc6-f51ab6dfbd22"), null, "Teacher", "TEACHER" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Surname", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "27C53444-1DC6-4CFF-B6AF-5FAF5A7C7722", 0, "9d8dd135-fe91-44b1-ab94-ae641931ca81", "stud@gmail.com", false, false, null, "TEACH@GMAIL.COM", "DEFAULTSTUDENT", "AQAAAAIAAYagAAAAEKBXtq8k+JD84YYKhCvqAWMtWbri8GG2INOSOaRLUNmvmnRm7dzVRnEY1gzetWETpg==", null, false, "146323a0-c715-48c3-953f-6e15c8d69194", false, "DefaultStudent" },
-                    { "2A6EE01C-E688-456B-A469-AF63AEB0CE8E", 0, "6280c384-fce7-42f0-b682-3641ed053868", "teach@gmail.com", false, false, null, "TEACH@GMAIL.COM", "DEFAULTTEACH", "AQAAAAIAAYagAAAAEH3n+a++azy7SYd4ZSE7O+OFUtQKMXxkefus/lMd+YtGiXrD9dtsw3bhBvhviNo4Ww==", null, false, "69a1334a-6b40-4397-9b10-7a86daa9d664", false, "DefaultTeach" },
-                    { "7317BB72-7732-48F5-A34F-6110D503578D", 0, "f3d1315d-55ce-4dad-a6c9-e74d36bb453a", "admin@gmail.com", false, false, null, "ADMIN@GMAIL.COM", "DEFAULTADMIN", "AQAAAAIAAYagAAAAEPnl6bE7tpKqxyPlJTESkXC3vTgHyrYA0L3ZkB5Tgh8ZAQZ0TnUFxTM36gBYlvnyIg==", null, false, "b097c630-3635-4f7b-bc80-d52e966ef1c8", false, "DefaultAdmin" }
+                    { new Guid("27c53444-1dc6-4cff-b6af-5faf5a7c7722"), 0, "a279ad71-a388-4cd1-b2dd-00426a09c2b8", "stud@gmail.com", false, false, null, null, "TEACH@GMAIL.COM", "DEFAULTSTUDENT", "AQAAAAIAAYagAAAAEDrFeSvMg66XgJz9lWlA+ii7lvBEYaaWAYWsPnQ3lovkyQWGUUCadMV4U7bU/n1aow==", null, false, "d812b7d0-3777-4ce1-9248-025f066ac66c", null, false, "DefaultStudent" },
+                    { new Guid("2a6ee01c-e688-456b-a469-af63aeb0ce8e"), 0, "5a526ce3-9de3-4603-a680-618589f8fd16", "teach@gmail.com", false, false, null, null, "TEACH@GMAIL.COM", "DEFAULTTEACH", "AQAAAAIAAYagAAAAEGif73hjGfkN9qtbsFskgVl1Ha1rqd3ER30B36iUyzkojdzBINUMoHjGWIG+55ZAUQ==", null, false, "b7ad4221-cd09-4b48-af93-79454e139d19", null, false, "DefaultTeach" },
+                    { new Guid("7317bb72-7732-48f5-a34f-6110d503578d"), 0, "9d5d7813-64e9-4194-a2af-5015e10d4a91", "admin@gmail.com", false, false, null, null, "ADMIN@GMAIL.COM", "DEFAULTADMIN", "AQAAAAIAAYagAAAAEGHNia1HSrtDvwCEPHNNMM9iJh79TPvoswAKYuOXivB5XMmMfR6cws+gjEsnsPC3QQ==", null, false, "ee4dbb28-1332-4823-b2fd-4e0d010d8bc6", null, false, "DefaultAdmin" }
                 });
 
             migrationBuilder.InsertData(
@@ -184,9 +222,9 @@ namespace IdentityService.Data.Migrations
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { "3BAE9791-3BAF-4C97-9E69-AF551E65F309", "27C53444-1DC6-4CFF-B6AF-5FAF5A7C7722" },
-                    { "5C24F991-CBC7-43C8-BBC6-F51AB6DFBD22", "2A6EE01C-E688-456B-A469-AF63AEB0CE8E" },
-                    { "02FE34E6-D974-439A-AD6B-032DDC1CDD47", "7317BB72-7732-48F5-A34F-6110D503578D" }
+                    { new Guid("3bae9791-3baf-4c97-9e69-af551e65f309"), new Guid("27c53444-1dc6-4cff-b6af-5faf5a7c7722") },
+                    { new Guid("5c24f991-cbc7-43c8-bbc6-f51ab6dfbd22"), new Guid("2a6ee01c-e688-456b-a469-af63aeb0ce8e") },
+                    { new Guid("02fe34e6-d974-439a-ad6b-032ddc1cdd47"), new Guid("7317bb72-7732-48f5-a34f-6110d503578d") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -244,6 +282,12 @@ namespace IdentityService.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
+
+            migrationBuilder.DropTable(
+                name: "StudentsByGroups");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

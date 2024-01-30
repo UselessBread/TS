@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Common.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 using TS.Data.Contracts.DTO;
 
 namespace TS.Data.Contracts.Entities
