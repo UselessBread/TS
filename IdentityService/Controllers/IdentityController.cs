@@ -34,13 +34,13 @@ namespace IdentityService.Controllers
 
         //[Authorize(Roles = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("getallgroups")]
-        public async Task<List<GetAllGroupsResponseDto>> GetAllGroups()
+        public async Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroups(PaginationRequest paginationRequest)
         {
-            return await _userService.GetAllGroups();
+            return await _userService.GetAllGroups(paginationRequest);
         }
 
         [HttpPost("find")]
-        public async Task<List<FindUserResponseDto>> Find([FromBody]PaginationRequest<FindRequestDto> paginationRequest)
+        public async Task<PaginatedResponse<FindUserResponseDto>> Find([FromBody]PaginationRequest<FindRequestDto> paginationRequest)
         {
             return await _userService.FindUser(paginationRequest);
         }

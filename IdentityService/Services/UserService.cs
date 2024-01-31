@@ -16,8 +16,8 @@ namespace IdentityService.Services
     {
         public Task CreateUser( CreateUserRequestDto request);
         public Task<SignInResponseDto> SignIn(SignInDto dto);
-        public Task<List<GetAllGroupsResponseDto>> GetAllGroups();
-        public Task<List<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> pagination);
+        public Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroups(PaginationRequest paginationRequest);
+        public Task<PaginatedResponse<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> pagination);
         public Task AddStudentsToGroup(AddStudentsToGroupRequest dto);
         public Task CreateNewGroupAsync(CreateNewGroupRequest dto);
     }
@@ -105,14 +105,14 @@ namespace IdentityService.Services
             };
         }
 
-        public async Task<List<GetAllGroupsResponseDto>> GetAllGroups()
+        public async Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroups(PaginationRequest paginationRequest)
         {
-            return _usersRepository.GetAllGroups();
+            return await _usersRepository.GetAllGroupsAsync(paginationRequest);
         }
 
-        public async Task<List<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> paginationRequest)
+        public async Task<PaginatedResponse<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> paginationRequest)
         {
-            return _usersRepository.FindUser(paginationRequest);
+            return await _usersRepository.FindUserAsync(paginationRequest);
         }
 
         public async Task AddStudentsToGroup(AddStudentsToGroupRequest dto)

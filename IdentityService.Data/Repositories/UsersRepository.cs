@@ -2,6 +2,7 @@
 using Common.Exceptions;
 using IdentityService.Data.Contracts.DTO;
 using IdentityService.Data.Contracts.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,8 @@ namespace IdentityService.Data.Repositories
 
     public interface IUsersRepository
     {
-        public List<GetAllGroupsResponseDto> GetAllGroups();
-        public List<FindUserResponseDto> FindUser(PaginationRequest<FindRequestDto> paginationRequest);
+        public Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroupsAsync(PaginationRequest paginationRequest);
+        public Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest);
         public void CreateNewGroupAsync(CreateNewGroupRequest dto);
         public void AddStudentsToGroup(AddStudentsToGroupRequest dto);
 
@@ -28,9 +29,9 @@ namespace IdentityService.Data.Repositories
             _context = context;
         }
 
-        public List<GetAllGroupsResponseDto> GetAllGroups()
+        public async Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroupsAsync(PaginationRequest paginationRequest)
         {
-            return _context.Groups.Join(_context.Users, g => g.TeacherId, u => u.Id, (g, u) => new
+            IQueryable<GetAllGroupsResponseDto> request = _context.Groups.Join(_context.Users, g => g.TeacherId, u => u.Id, (g, u) => new
             {
                 GroupImmutableId = g.ImmutableId,
                 GroupName = g.Name,
@@ -43,10 +44,13 @@ namespace IdentityService.Data.Repositories
                 TeacherName = r.TeacherName,
                 TeacherSurname = r.TeacherSurname,
                 GroupImmutableId = r.GroupImmutableId
-            }).ToList();
+            });
+
+            int allEntriesCount = await request.CountAsync();
+            return new PaginatedResponse<GetAllGroupsResponseDto>(await request.ToListAsync(), allEntriesCount);
         }
 
-        public List<FindUserResponseDto> FindUser(PaginationRequest<FindRequestDto> paginationRequest)
+        public async Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest)
         {
             var requestDto = paginationRequest.Request;
             string roleToBeFound = string.Empty;
@@ -81,7 +85,9 @@ namespace IdentityService.Data.Repositories
             if (!string.IsNullOrEmpty(requestDto.Surname))
                 joinedTables = joinedTables = joinedTables.Where(r => r.User.Surname.Contains(requestDto.Surname));
 
-            return joinedTables.Select(res => new FindUserResponseDto
+            int allEntriesCount = await joinedTables.CountAsync();
+
+            List<FindUserResponseDto> res = joinedTables.Select(res => new FindUserResponseDto
             {
                 UserId = res.User.Id,
                 Surname = res.User.Surname,
@@ -91,6 +97,8 @@ namespace IdentityService.Data.Repositories
                 .Skip(paginationRequest.PageSize * (paginationRequest.PageNumber - 1))
                 .Take(paginationRequest.PageSize)
                 .ToList();
+
+            return new PaginatedResponse<FindUserResponseDto>(res, allEntriesCount);
         }
 
         public void AddStudentsToGroup(AddStudentsToGroupRequest dto)

@@ -15,4 +15,17 @@
         }
 
     }
+
+    public class PaginationRequest
+    {
+        public int PageSize { get; set; } = 10;
+        public int PageNumber { get; set; } = 1;
+
+        public PaginationRequest(int pageNumber, int pageSize = 10)
+        {
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+        }
+
+    }
 }
