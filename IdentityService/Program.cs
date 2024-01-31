@@ -1,6 +1,7 @@
 using Common.Web;
 using IdentityService.Data;
 using IdentityService.Data.Contracts.Entities;
+using IdentityService.Data.Repositories;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -50,6 +51,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

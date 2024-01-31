@@ -2,6 +2,7 @@
 using Common.Exceptions;
 using IdentityService.Data.Contracts.DTO;
 using IdentityService.Data.Contracts.Entities;
+using IdentityService.Data.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,19 +15,27 @@ namespace IdentityService.Services
     {
         public Task CreateUser( CreateUserRequestDto request);
         public Task<SignInResponseDto> SignIn(SignInDto dto);
-
+        public Task<List<GetAllGroupsResponseDto>> GetAllGroups();
+        public Task<List<FindUserResponseDto>> FindUser(FindRequestDto dto);
+        public Task AddStudentsToGroup(AddStudentsToGroupRequest dto);
+        public Task CreateNewGroupAsync(CreateNewGroupRequest dto);
     }
 
     public class UserService : IUserService
     {
         private readonly UserManager<TsUser> _userManager;
         private readonly SignInManager<TsUser> _signInManager;
+        private readonly IUsersRepository _usersRepository;
         private readonly IConfiguration _config;
 
-        public UserService(UserManager<TsUser> userManager, SignInManager<TsUser> signInManager, IConfiguration config)
+        public UserService(UserManager<TsUser> userManager,
+                           SignInManager<TsUser> signInManager,
+                           IUsersRepository usersRepository,
+                           IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _usersRepository = usersRepository;
             _config = config;
         }
 
@@ -36,6 +45,8 @@ namespace IdentityService.Services
             {
                 UserName = request.UserName,
                 Email = request.Email,
+                Name = request.Name,
+                Surname = request.Surname
             },
             request.Password);
             CheckIdentityResult(res);
@@ -91,6 +102,26 @@ namespace IdentityService.Services
                 UserName = user.UserName ?? throw new InvelidDataException("UserName cannot be null"),
                 Role = roles.First()
             };
+        }
+
+        public async Task<List<GetAllGroupsResponseDto>> GetAllGroups()
+        {
+            return _usersRepository.GetAllGroups();
+        }
+
+        public async Task<List<FindUserResponseDto>> FindUser(FindRequestDto dto)
+        {
+            return _usersRepository.FindUser(dto);
+        }
+
+        public async Task AddStudentsToGroup(AddStudentsToGroupRequest dto)
+        {
+            _usersRepository.AddStudentsToGroup(dto);
+        }
+
+        public async Task CreateNewGroupAsync(CreateNewGroupRequest dto)
+        {
+            _usersRepository.CreateNewGroupAsync(dto);
         }
 
         private static void CheckIdentityResult(IdentityResult res)

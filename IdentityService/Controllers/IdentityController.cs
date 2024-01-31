@@ -31,6 +31,29 @@ namespace IdentityService.Controllers
             return await _userService.SignIn(dto);
         }
 
-        
+        //[Authorize(Roles = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("getallgroups")]
+        public async Task<List<GetAllGroupsResponseDto>> GetAllGroups()
+        {
+            return await _userService.GetAllGroups();
+        }
+
+        [HttpPost("find")]
+        public async Task<List<FindUserResponseDto>> Find([FromBody]FindRequestDto dto)
+        {
+            return await _userService.FindUser(dto);
+        }
+
+        [HttpPost("addstudentstogroup")]
+        public async Task AddStudentsToGroup([FromBody]AddStudentsToGroupRequest dto)
+        {
+            await _userService.AddStudentsToGroup(dto);
+        }
+
+        [HttpPost("creategroup")]
+        public async Task CreateNewGroup(CreateNewGroupRequest dto)
+        {
+            await _userService.CreateNewGroupAsync(dto);
+        }
     }
 }
