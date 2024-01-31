@@ -1,4 +1,5 @@
 ﻿using Common.Constants;
+using Common.Dto;
 using Common.Exceptions;
 using IdentityService.Data.Contracts.DTO;
 using IdentityService.Data.Contracts.Entities;
@@ -16,7 +17,7 @@ namespace IdentityService.Services
         public Task CreateUser( CreateUserRequestDto request);
         public Task<SignInResponseDto> SignIn(SignInDto dto);
         public Task<List<GetAllGroupsResponseDto>> GetAllGroups();
-        public Task<List<FindUserResponseDto>> FindUser(FindRequestDto dto);
+        public Task<List<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> pagination);
         public Task AddStudentsToGroup(AddStudentsToGroupRequest dto);
         public Task CreateNewGroupAsync(CreateNewGroupRequest dto);
     }
@@ -109,9 +110,9 @@ namespace IdentityService.Services
             return _usersRepository.GetAllGroups();
         }
 
-        public async Task<List<FindUserResponseDto>> FindUser(FindRequestDto dto)
+        public async Task<List<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> paginationRequest)
         {
-            return _usersRepository.FindUser(dto);
+            return _usersRepository.FindUser(paginationRequest);
         }
 
         public async Task AddStudentsToGroup(AddStudentsToGroupRequest dto)

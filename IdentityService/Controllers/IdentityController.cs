@@ -1,4 +1,5 @@
-﻿using IdentityService.Data.Contracts.DTO;
+﻿using Common.Dto;
+using IdentityService.Data.Contracts.DTO;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -39,9 +40,9 @@ namespace IdentityService.Controllers
         }
 
         [HttpPost("find")]
-        public async Task<List<FindUserResponseDto>> Find([FromBody]FindRequestDto dto)
+        public async Task<List<FindUserResponseDto>> Find([FromBody]PaginationRequest<FindRequestDto> paginationRequest)
         {
-            return await _userService.FindUser(dto);
+            return await _userService.FindUser(paginationRequest);
         }
 
         [HttpPost("addstudentstogroup")]

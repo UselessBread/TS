@@ -1,4 +1,5 @@
-﻿using Common.Exceptions;
+﻿using Common.Dto;
+using Common.Exceptions;
 using IdentityService.Data.Contracts.DTO;
 using IdentityService.Data.Contracts.Entities;
 using System;
@@ -13,7 +14,7 @@ namespace IdentityService.Data.Repositories
     public interface IUsersRepository
     {
         public List<GetAllGroupsResponseDto> GetAllGroups();
-        public List<FindUserResponseDto> FindUser(FindRequestDto dto);
+        public List<FindUserResponseDto> FindUser(PaginationRequest<FindRequestDto> paginationRequest);
         public void CreateNewGroupAsync(CreateNewGroupRequest dto);
         public void AddStudentsToGroup(AddStudentsToGroupRequest dto);
 
@@ -45,10 +46,11 @@ namespace IdentityService.Data.Repositories
             }).ToList();
         }
 
-        public List<FindUserResponseDto> FindUser(FindRequestDto dto)
+        public List<FindUserResponseDto> FindUser(PaginationRequest<FindRequestDto> paginationRequest)
         {
+            var requestDto = paginationRequest.Request;
             string roleToBeFound = string.Empty;
-            switch (dto.UserType)
+            switch (requestDto.UserType)
             {
                 case Common.Constants.UserTypes.Admin:
                     roleToBeFound = "Admin";
@@ -73,12 +75,12 @@ namespace IdentityService.Data.Repositories
                 Role = r
             }).Where(res => res.Role.Name == roleToBeFound);
 
-            if (!string.IsNullOrEmpty(dto.Name))
-                joinedTables = joinedTables.Where(r => r.User.Name.Contains(dto.Name));
-            if (!string.IsNullOrEmpty(dto.Surname))
-                joinedTables = joinedTables = joinedTables.Where(r => r.User.Surname.Contains(dto.Surname));
-            // temp.Where(r=>r.Role.Name == roleToBeFound && (!string.IsNullOrEmpty(r.User.Name) &&r.User.Name.Contains(dto.Name))).ToList()
-            // temp.Where(r=>r.Role.Name == roleToBeFound && (!string.IsNullOrEmpty(r.User.Name))).ToList()
+            if (!string.IsNullOrEmpty(requestDto.Name))
+                joinedTables = joinedTables.Where(r => r.User.Name.Contains(requestDto.Name));
+
+            if (!string.IsNullOrEmpty(requestDto.Surname))
+                joinedTables = joinedTables = joinedTables.Where(r => r.User.Surname.Contains(requestDto.Surname));
+
             return joinedTables.Select(res => new FindUserResponseDto
             {
                 UserId = res.User.Id,
@@ -86,7 +88,9 @@ namespace IdentityService.Data.Repositories
                 Email = res.User.Email,
                 Name = res.User.Name
             })
-            .ToList();
+                .Skip(paginationRequest.PageSize * (paginationRequest.PageNumber - 1))
+                .Take(paginationRequest.PageSize)
+                .ToList();
         }
 
         public void AddStudentsToGroup(AddStudentsToGroupRequest dto)
@@ -98,9 +102,9 @@ namespace IdentityService.Data.Repositories
 
             // only add new students
             var existingStuds = _context.StudentsByGroups
-                .Where(g=>g.GroupImmutableId==dto.GroupImmutableId && dto.Students.Contains(g.StuedntId))
-                .Select(res=>res.StuedntId).ToList();
-            var studentsToAdd = dto.Students.Where(s=>!existingStuds.Contains(s)).ToList();
+                .Where(g => g.GroupImmutableId == dto.GroupImmutableId && dto.Students.Contains(g.StuedntId))
+                .Select(res => res.StuedntId).ToList();
+            var studentsToAdd = dto.Students.Where(s => !existingStuds.Contains(s)).ToList();
 
             foreach (var student in studentsToAdd)
             {
