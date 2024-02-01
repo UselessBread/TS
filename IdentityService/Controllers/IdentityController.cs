@@ -56,5 +56,12 @@ namespace IdentityService.Controllers
         {
             await _userService.CreateNewGroupAsync(dto);
         }
+
+        [HttpGet("getuserbyid")]
+        public async Task<FindUserResponseDto> GetUserById([FromQuery]Guid userId)
+        {
+            return await _userService.GetUserById(userId);
+
+        }
     }
 }

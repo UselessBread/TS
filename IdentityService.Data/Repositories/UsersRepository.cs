@@ -80,10 +80,10 @@ namespace IdentityService.Data.Repositories
             }).Where(res => res.Role.Name == roleToBeFound);
 
             if (!string.IsNullOrEmpty(requestDto.Name))
-                joinedTables = joinedTables.Where(r => r.User.Name.Contains(requestDto.Name));
+                joinedTables = joinedTables.Where(r => r.User.Name.Contains(requestDto.Name, StringComparison.OrdinalIgnoreCase));
 
             if (!string.IsNullOrEmpty(requestDto.Surname))
-                joinedTables = joinedTables = joinedTables.Where(r => r.User.Surname.Contains(requestDto.Surname));
+                joinedTables = joinedTables = joinedTables.Where(r => r.User.Surname.Contains(requestDto.Surname, StringComparison.OrdinalIgnoreCase));
 
             int allEntriesCount = await joinedTables.CountAsync();
 

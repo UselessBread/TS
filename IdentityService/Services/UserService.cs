@@ -20,6 +20,7 @@ namespace IdentityService.Services
         public Task<PaginatedResponse<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> pagination);
         public Task AddStudentsToGroup(AddStudentsToGroupRequest dto);
         public Task CreateNewGroupAsync(CreateNewGroupRequest dto);
+        public Task<FindUserResponseDto> GetUserById(Guid userId);
     }
 
     public class UserService : IUserService
@@ -38,6 +39,19 @@ namespace IdentityService.Services
             _signInManager = signInManager;
             _usersRepository = usersRepository;
             _config = config;
+        }
+
+        public async Task<FindUserResponseDto> GetUserById(Guid userId)
+        {
+            TsUser res = await _userManager.FindByIdAsync(userId.ToString()) ??
+                throw new BadRequestException($"No user with id = {userId} was found");
+            return new FindUserResponseDto
+            {
+                Email = res.Email,
+                Name = res.Name,
+                Surname = res.Surname,
+                UserId = res.Id
+            };
         }
 
         public async Task CreateUser(CreateUserRequestDto request)
