@@ -39,6 +39,12 @@ namespace IdentityService.Controllers
             return await _userService.GetAllGroups(paginationRequest);
         }
 
+        [HttpGet("getgroupinfobyid")]
+        public async Task<GetGroupInfoResponseDto> GetGroupInfoById(Guid immutableId)
+        {
+            return await _userService.GetGroupInfoById(immutableId);
+        }
+
         [HttpPost("find")]
         public async Task<PaginatedResponse<FindUserResponseDto>> Find([FromBody]PaginationRequest<FindRequestDto> paginationRequest)
         {
@@ -61,6 +67,12 @@ namespace IdentityService.Controllers
         public async Task<FindUserResponseDto> GetUserById([FromQuery]Guid userId)
         {
             return await _userService.GetUserById(userId);
+        }
+
+        [HttpPost("updategroup")]
+        public async Task UpdateGroup(UpdateGroupRequestDto dto)
+        {
+            await _userService.UpdateGroup(dto);
         }
     }
 }

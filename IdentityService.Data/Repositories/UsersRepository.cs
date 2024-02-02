@@ -10,9 +10,11 @@ namespace IdentityService.Data.Repositories
     public interface IUsersRepository
     {
         public Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroupsAsync(PaginationRequest paginationRequest);
+        public Task<GetGroupInfoResponseDto> GetGroupInfoById(Guid immutableId);
         public Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest);
         public Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto);
         public Task AddStudentsToGroupAsync(AddStudentsToGroupRequest dto);
+        public Task UpdateGroup(UpdateGroupRequestDto dto);
 
     }
 
@@ -43,6 +45,21 @@ namespace IdentityService.Data.Repositories
 
             int allEntriesCount = await request.CountAsync();
             return new PaginatedResponse<GetAllGroupsResponseDto>(await request.ToListAsync(), allEntriesCount);
+        }
+
+        public async Task<GetGroupInfoResponseDto> GetGroupInfoById(Guid immutableId)
+        {
+            Groups group = await _context.Groups.FirstOrDefaultAsync(g => g.ImmutableId == immutableId && g.DeletionDate == null)
+                ?? throw new EntityNotFoundException($"Entity with UUID {immutableId} was not found");
+
+            List<Guid> studs = await _context.StudentsByGroups.Where(sg => sg.GroupImmutableId == group.ImmutableId).Select(r => r.StuedntId).ToListAsync();
+
+            return new GetGroupInfoResponseDto
+            {
+                GroupName = group.Name,
+                StudentIds = studs,
+                TeacherId = group.TeacherId
+            };
         }
 
         public async Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest)
@@ -99,7 +116,7 @@ namespace IdentityService.Data.Repositories
         public async Task AddStudentsToGroupAsync(AddStudentsToGroupRequest dto)
         {
             if (!_context.Groups.Any(g => g.ImmutableId == dto.GroupImmutableId))
-                throw new BadRequestException("Such group does not exist");
+                throw new EntityNotFoundException("Such group does not exist");
 
             DateTime creationDate = DateTime.Now.ToUniversalTime();
 
@@ -108,8 +125,10 @@ namespace IdentityService.Data.Repositories
                 .Where(g => g.GroupImmutableId == dto.GroupImmutableId && dto.Students.Contains(g.StuedntId))
                 .Select(res => res.StuedntId).ToList();
             var studentsToAdd = dto.Students.Where(s => !existingStuds.Contains(s)).ToList();
+            var studentsToDelete = _context.StudentsByGroups
+                .Where(g => g.GroupImmutableId == dto.GroupImmutableId && !dto.Students.Contains(g.StuedntId)).ToArray();
 
-            foreach (var student in studentsToAdd)
+            foreach (Guid student in studentsToAdd)
             {
                 _context.StudentsByGroups.Add(new StudentsByGroups
                 {
@@ -118,6 +137,7 @@ namespace IdentityService.Data.Repositories
                 });
             }
 
+            _context.StudentsByGroups.RemoveRange(studentsToDelete);
             await _context.SaveChangesAsync();
         }
 
@@ -144,6 +164,28 @@ namespace IdentityService.Data.Repositories
             await _context.SaveChangesAsync();
 
             return res.Entity.ImmutableId;
+        }
+
+        public async Task UpdateGroup(UpdateGroupRequestDto dto)
+        {
+            Groups res = _context.Groups.FirstOrDefault(g => g.ImmutableId == dto.GroupImmutableId && g.DeletionDate == null)
+                ?? throw new EntityNotFoundException($"Entity with UUID {dto.GroupImmutableId} was not found");
+
+            DateTime currentTime = DateTime.Now.ToUniversalTime();
+            res.DeletionDate = currentTime;
+            _context.Groups.Update(res);
+
+            Groups createdGroup = new Groups
+            {
+                ImmutableId = res.ImmutableId,
+                Version = res.Version + 1,
+                Name = dto.Name,
+                TeacherId = dto.TeacherId,
+                CreationDate = currentTime
+            };
+            _context.Groups.Add(createdGroup);
+
+            await _context.SaveChangesAsync();
         }
 
     }

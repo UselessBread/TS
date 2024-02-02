@@ -17,10 +17,12 @@ namespace IdentityService.Services
         public Task CreateUser( CreateUserRequestDto request);
         public Task<SignInResponseDto> SignIn(SignInDto dto);
         public Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroups(PaginationRequest paginationRequest);
+        public Task<GetGroupInfoResponseDto> GetGroupInfoById(Guid immutableId);
         public Task<PaginatedResponse<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> pagination);
         public Task AddStudentsToGroup(AddStudentsToGroupRequest dto);
         public Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto);
         public Task<FindUserResponseDto> GetUserById(Guid userId);
+        public Task UpdateGroup(UpdateGroupRequestDto dto);
     }
 
     public class UserService : IUserService
@@ -125,6 +127,11 @@ namespace IdentityService.Services
             return await _usersRepository.GetAllGroupsAsync(paginationRequest);
         }
 
+        public async Task<GetGroupInfoResponseDto> GetGroupInfoById(Guid immutableId)
+        {
+            return await _usersRepository.GetGroupInfoById(immutableId);
+        }
+
         public async Task<PaginatedResponse<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> paginationRequest)
         {
             return await _usersRepository.FindUserAsync(paginationRequest);
@@ -153,6 +160,11 @@ namespace IdentityService.Services
 
                 throw new BadRequestException(stringBuilder.ToString());
             }
+        }
+
+        public async Task UpdateGroup(UpdateGroupRequestDto dto)
+        {
+            await _usersRepository.UpdateGroup(dto);
         }
     }
 }

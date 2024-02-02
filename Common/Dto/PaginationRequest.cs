@@ -13,7 +13,6 @@
             PageSize = pageSize;
             Request = request;
         }
-
     }
 
     public class PaginationRequest
@@ -26,6 +25,5 @@
             PageNumber = pageNumber;
             PageSize = pageSize;
         }
-
     }
 }
