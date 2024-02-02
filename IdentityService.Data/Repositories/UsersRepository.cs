@@ -16,8 +16,8 @@ namespace IdentityService.Data.Repositories
     {
         public Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroupsAsync(PaginationRequest paginationRequest);
         public Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest);
-        public void CreateNewGroupAsync(CreateNewGroupRequest dto);
-        public void AddStudentsToGroup(AddStudentsToGroupRequest dto);
+        public Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto);
+        public Task AddStudentsToGroupAsync(AddStudentsToGroupRequest dto);
 
     }
 
@@ -101,7 +101,7 @@ namespace IdentityService.Data.Repositories
             return new PaginatedResponse<FindUserResponseDto>(res, allEntriesCount);
         }
 
-        public void AddStudentsToGroup(AddStudentsToGroupRequest dto)
+        public async Task AddStudentsToGroupAsync(AddStudentsToGroupRequest dto)
         {
             if (!_context.Groups.Any(g => g.ImmutableId == dto.GroupImmutableId))
                 throw new BadRequestException("Such group does not exist");
@@ -126,10 +126,10 @@ namespace IdentityService.Data.Repositories
                 });
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void CreateNewGroupAsync(CreateNewGroupRequest dto)
+        public async Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto)
         {
             // check for teacher
             if (!_context.UserRoles.Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new
@@ -139,7 +139,8 @@ namespace IdentityService.Data.Repositories
             }).Any(res => res.UserId == dto.TeacherId && res.RoleName == "Teacher"))
                 throw new BadRequestException("User was not a teacher or does not exist");
 
-            _context.Groups.Add(new Groups
+
+            Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<Groups> res = _context.Groups.Add(new Groups
             {
                 ImmutableId = Guid.NewGuid(),
                 Name = dto.Name,
@@ -148,7 +149,9 @@ namespace IdentityService.Data.Repositories
                 CreationDate = DateTime.Now.ToUniversalTime(),
             });
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            return res.Entity.ImmutableId;
         }
 
     }

@@ -19,7 +19,7 @@ namespace IdentityService.Services
         public Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroups(PaginationRequest paginationRequest);
         public Task<PaginatedResponse<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> pagination);
         public Task AddStudentsToGroup(AddStudentsToGroupRequest dto);
-        public Task CreateNewGroupAsync(CreateNewGroupRequest dto);
+        public Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto);
         public Task<FindUserResponseDto> GetUserById(Guid userId);
     }
 
@@ -131,12 +131,12 @@ namespace IdentityService.Services
 
         public async Task AddStudentsToGroup(AddStudentsToGroupRequest dto)
         {
-            _usersRepository.AddStudentsToGroup(dto);
+            await _usersRepository.AddStudentsToGroupAsync(dto);
         }
 
-        public async Task CreateNewGroupAsync(CreateNewGroupRequest dto)
+        public async Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto)
         {
-            _usersRepository.CreateNewGroupAsync(dto);
+            return await _usersRepository.CreateNewGroupAsync(dto);
         }
 
         private static void CheckIdentityResult(IdentityResult res)

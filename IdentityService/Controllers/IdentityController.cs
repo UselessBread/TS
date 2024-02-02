@@ -33,7 +33,7 @@ namespace IdentityService.Controllers
         }
 
         //[Authorize(Roles = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("getallgroups")]
+        [HttpPost("getallgroups")]
         public async Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroups(PaginationRequest paginationRequest)
         {
             return await _userService.GetAllGroups(paginationRequest);
@@ -52,16 +52,15 @@ namespace IdentityService.Controllers
         }
 
         [HttpPost("creategroup")]
-        public async Task CreateNewGroup(CreateNewGroupRequest dto)
+        public async Task<Guid> CreateNewGroup(CreateNewGroupRequest dto)
         {
-            await _userService.CreateNewGroupAsync(dto);
+            return await _userService.CreateNewGroupAsync(dto);
         }
 
         [HttpGet("getuserbyid")]
         public async Task<FindUserResponseDto> GetUserById([FromQuery]Guid userId)
         {
             return await _userService.GetUserById(userId);
-
         }
     }
 }
