@@ -105,7 +105,8 @@ namespace IdentityService.Services
             IList<string> roles = await _userManager.GetRolesAsync(user);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            Claim[] claims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToArray();
+            List<Claim> claims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
+            claims.Add(new Claim("Id", user.Id.ToString()));
 
             JwtSecurityToken token = new JwtSecurityToken(_config["Jwt:Issuer"],
                                              _config["Jwt:Audience"],

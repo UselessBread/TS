@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using System.Text;
-using TS.Data;
-using TS.Data.Repositories;
+using TA.Data;
+using TA.Data.Repositories;
+using TA.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,12 +14,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// Have to use NpgsqlDataSourceBuilder in order to enable JSON mapping.
-var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;Database=ts;Username=usr;Password=pwd")
+var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;Database=ta;Username=usr;Password=pwd")
     .EnableDynamicJson();
 var dataSource = dataSourceBuilder.Build();
-builder.Services.AddDbContext<TestsContext>(options => options.UseNpgsql(dataSource));
-builder.Services.AddScoped<ITestsRepository, TestsRepository>();
+builder.Services.AddDbContext<AssignedTestsContext>(options => options.UseNpgsql(dataSource));
+builder.Services.AddScoped<ITestAssignerService, TestAssignerService>();
+builder.Services.AddScoped<IAssignedTestsRepository, AssignedTestsRepository>();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 //JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -34,10 +39,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
