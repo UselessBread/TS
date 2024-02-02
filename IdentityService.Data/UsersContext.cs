@@ -117,10 +117,10 @@ namespace IdentityService.Data
                 Name = "Sigma",
                 Surname = "Teacher",
                 Id = thirdTeachUserId,
-                UserName = "st",
-                NormalizedUserName = "ST",
-                Email = "st@gmail.com",
-                NormalizedEmail = "ST@GMAIL.COM",
+                UserName = "sigt",
+                NormalizedUserName = "SIGT",
+                Email = "sigt@gmail.com",
+                NormalizedEmail = "SIGT@GMAIL.COM",
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
@@ -138,12 +138,12 @@ namespace IdentityService.Data
             TsUser fstStudentIdentity = new TsUser
             {
                 Name = "Ivan",
-                Surname = "Eblan",
+                Surname = "Eblanov",
                 Id = fstStudentUserId,
-                UserName = "ie",
-                NormalizedUserName = "IE",
-                Email = "ie@gmail.com",
-                NormalizedEmail = "IE@GMAIL.COM",
+                UserName = "ieov",
+                NormalizedUserName = "IEOV",
+                Email = "ieov@gmail.com",
+                NormalizedEmail = "IEOV@GMAIL.COM",
                 SecurityStamp = Guid.NewGuid().ToString()
             };
             TsUser secStudentIdentity = new TsUser
@@ -173,10 +173,10 @@ namespace IdentityService.Data
                 Name = "Fourth",
                 Surname = "Student",
                 Id = fourthStudentUserId,
-                UserName = "fs",
-                NormalizedUserName = "FS",
-                Email = "fs@gmail.com",
-                NormalizedEmail = "FS@GMAIL.COM",
+                UserName = "frs",
+                NormalizedUserName = "FRS",
+                Email = "frs@gmail.com",
+                NormalizedEmail = "FRS@GMAIL.COM",
                 SecurityStamp = Guid.NewGuid().ToString()
             };
             TsUser fifthStudentIdentity = new TsUser
@@ -184,10 +184,10 @@ namespace IdentityService.Data
                 Name = "Fifth",
                 Surname = "Sudent",
                 Id = fifthStudentUserId,
-                UserName = "fs",
-                NormalizedUserName = "FS",
-                Email = "fs@gmail.com",
-                NormalizedEmail = "FS@GMAIL.COM",
+                UserName = "ffs",
+                NormalizedUserName = "FFS",
+                Email = "ffs@gmail.com",
+                NormalizedEmail = "FFS@GMAIL.COM",
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
@@ -202,7 +202,15 @@ namespace IdentityService.Data
             {
                 adminIdentity,
                 teacherIdentity,
-                studentIdentity
+                studentIdentity,
+                fstTeachIdentity,
+                secTeachIdentity,
+                thirdTeachIdentity,
+                fstStudentIdentity,
+                secStudentIdentity,
+                thirdStudentIdentity,
+                fourthStudentIdentity,
+                fifthStudentIdentity,
             });
 
             builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid>[]
