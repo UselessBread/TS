@@ -2,7 +2,7 @@
 
 namespace IdentityService.Data.Contracts.Entities
 {
-    public class StudentsByGroups : VersionedEntityBase
+    public class StudentsByGroups
     {
         public int Id {  get; set; }
         public Guid GroupImmutableId { get; set; }

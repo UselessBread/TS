@@ -3,11 +3,6 @@ using Common.Exceptions;
 using IdentityService.Data.Contracts.DTO;
 using IdentityService.Data.Contracts.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdentityService.Data.Repositories
 {
@@ -91,7 +86,7 @@ namespace IdentityService.Data.Repositories
             {
                 UserId = res.User.Id,
                 Surname = res.User.Surname,
-                Email = res.User.Email,
+                Email = res.User.Email ?? string.Empty,
                 Name = res.User.Name
             })
                 .Skip(paginationRequest.PageSize * (paginationRequest.PageNumber - 1))
@@ -118,11 +113,8 @@ namespace IdentityService.Data.Repositories
             {
                 _context.StudentsByGroups.Add(new StudentsByGroups
                 {
-                    ImmutableId = Guid.NewGuid(),
                     StuedntId = student,
                     GroupImmutableId = dto.GroupImmutableId,
-                    Version = 1,
-                    CreationDate = creationDate
                 });
             }
 
