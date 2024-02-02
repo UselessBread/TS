@@ -1,4 +1,5 @@
 ﻿using Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using TS.Data.Contracts.DTO;
 using TS.Data.Contracts.Entities;
 
@@ -55,7 +56,7 @@ namespace TS.Data.Repositories
 
         public async Task<List<TestDescriptions>> GetAllDescriptions()
         {
-            return _context.TestDescriptions.Where(d => d.DeletionDate == null).OrderBy(d => d.Id).ToList();
+            return await _context.TestDescriptions.Where(d => d.DeletionDate == null).OrderBy(d => d.Id).ToListAsync();
         }
 
         //TODO: Get content directly by content ID
@@ -64,7 +65,7 @@ namespace TS.Data.Repositories
             var res = _context.TestDescriptions.FirstOrDefault(d=>d.ImmutableId == testDescriptionImmutableId && d.DeletionDate == null) ??
                 throw new EntityNotFoundException($"No testContent with ImmutableId = {testDescriptionImmutableId} was found");
 
-            return _context.TestsContent.OrderBy(c => c.Id).Last(c => c.ImmutableId == res.TestContentImmutableId);
+            return await _context.TestsContent.OrderBy(c => c.Id).LastAsync(c => c.ImmutableId == res.TestContentImmutableId);
         }
 
         public async Task Update(UpdateTestDto dto)

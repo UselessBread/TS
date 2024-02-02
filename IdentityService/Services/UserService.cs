@@ -45,9 +45,10 @@ namespace IdentityService.Services
         {
             TsUser res = await _userManager.FindByIdAsync(userId.ToString()) ??
                 throw new BadRequestException($"No user with id = {userId} was found");
+
             return new FindUserResponseDto
             {
-                Email = res.Email,
+                Email = res.Email ?? string.Empty,
                 Name = res.Name,
                 Surname = res.Surname,
                 UserId = res.Id
