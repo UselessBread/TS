@@ -7,8 +7,8 @@ namespace TS.Data.Repositories
 {
     public interface ITestsRepository
     {
-        public Task CreateNewTest(CreateNewTestDto dto);
-        public Task<List<TestDescriptions>> GetAllDescriptions();
+        public Task CreateNewTest(CreateNewTestDto dto, Guid userId);
+        public Task<List<TestDescriptions>> GetAllDescriptions(Guid userId);
 
         public Task<TestsContent> GetTestContentByDescriptionsId(Guid testDescriptionImmutableId);
         public Task Update(UpdateTestDto dto);
@@ -23,10 +23,10 @@ namespace TS.Data.Repositories
             _context = context;
         }
 
-        public async Task CreateNewTest(CreateNewTestDto dto)
+        public async Task CreateNewTest(CreateNewTestDto dto, Guid userId)
         {
             DateTime creatonTime = DateTime.Now.ToUniversalTime();
-            
+
             TestsContent testsContent = new TestsContent()
             {
                 Tasks = dto.Tasks,
@@ -37,7 +37,7 @@ namespace TS.Data.Repositories
             _context.TestsContent.Add(testsContent);
             await _context.SaveChangesAsync();
 
-            var foundContent = _context.TestsContent.FirstOrDefault(cont => cont.ImmutableId == testsContent.ImmutableId) ??
+            TestsContent foundContent = _context.TestsContent.FirstOrDefault(cont => cont.ImmutableId == testsContent.ImmutableId) ??
                 throw new EntityNotFoundException($"No testContent with ImmutableId = {testsContent.ImmutableId} was found");
             int createdContentId = foundContent.Id;
             TestDescriptions testDescription = new TestDescriptions
@@ -48,21 +48,25 @@ namespace TS.Data.Repositories
                 ImmutableId = Guid.NewGuid(),
                 CreationDate = creatonTime,
                 Version = 1,
+                CrreatedBy = userId
             };
 
             _context.TestDescriptions.Add(testDescription);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<TestDescriptions>> GetAllDescriptions()
+        public async Task<List<TestDescriptions>> GetAllDescriptions(Guid userId)
         {
-            return await _context.TestDescriptions.Where(d => d.DeletionDate == null).OrderBy(d => d.Id).ToListAsync();
+            return await _context.TestDescriptions
+                .Where(d => d.DeletionDate == null && d.CrreatedBy == userId)
+                .OrderBy(d => d.Id)
+                .ToListAsync();
         }
 
         //TODO: Get content directly by content ID
         public async Task<TestsContent> GetTestContentByDescriptionsId(Guid testDescriptionImmutableId)
         {
-            var res = _context.TestDescriptions.FirstOrDefault(d=>d.ImmutableId == testDescriptionImmutableId && d.DeletionDate == null) ??
+            TestDescriptions res = _context.TestDescriptions.FirstOrDefault(d => d.ImmutableId == testDescriptionImmutableId && d.DeletionDate == null) ??
                 throw new EntityNotFoundException($"No testContent with ImmutableId = {testDescriptionImmutableId} was found");
 
             return await _context.TestsContent.OrderBy(c => c.Id).LastAsync(c => c.ImmutableId == res.TestContentImmutableId);
@@ -96,9 +100,10 @@ namespace TS.Data.Repositories
             _context.TestsContent.Add(createdContent);
             await _context.SaveChangesAsync();
 
-            var foundContent = _context.TestsContent.FirstOrDefault(cont => cont.ImmutableId == dto.TestContentImmutableId &&
-            cont.DeletionDate == null) ??
-                throw new EntityNotFoundException($"No testContent with ImmutableId = {dto.TestContentImmutableId} was found");
+            TestsContent foundContent = _context.TestsContent
+                .FirstOrDefault(cont => cont.ImmutableId == dto.TestContentImmutableId && cont.DeletionDate == null) ??
+                    throw new EntityNotFoundException($"No testContent with ImmutableId = {dto.TestContentImmutableId} was found");
+
             int res = foundContent.Id;
 
             TestDescriptions createdDescr = new TestDescriptions
@@ -108,8 +113,10 @@ namespace TS.Data.Repositories
                 CreationDate = creatonTime,
                 ImmutableId = dto.TestDescriptionImmutableId,
                 Name = dto.TestName,
-                Version = existingDescription.Version + 1
+                Version = existingDescription.Version + 1,
+                CrreatedBy = existingDescription.CrreatedBy
             };
+
             _context.TestDescriptions.Add(createdDescr);
             await _context.SaveChangesAsync();
         }

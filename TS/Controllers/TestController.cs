@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Common.Web.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TS.Data.Contracts.DTO;
 using TS.Data.Contracts.Entities;
@@ -23,15 +24,17 @@ namespace TS.Controllers
         [HttpPost("create")]
         public async Task CreateNewTest(CreateNewTestDto dto)
         {
-            await _testsRepository.CreateNewTest(dto);
+            Guid userId = JwtTokenHelpers.GetUserIdFromToken(Request);
+            await _testsRepository.CreateNewTest(dto, userId);
         }
 
         //TODO: Use Pagination
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Teacher")]
         [HttpGet("descriptions")]
         public async Task<List<TestDescriptions>> GetAllDescriptions()
         {
-            return await _testsRepository.GetAllDescriptions();
+            Guid userId = JwtTokenHelpers.GetUserIdFromToken(Request);
+            return await _testsRepository.GetAllDescriptions(userId);
         }
 
         [HttpGet("content")]

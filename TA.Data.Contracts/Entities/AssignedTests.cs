@@ -12,5 +12,6 @@ namespace TA.Data.Contracts.Entities
         public DateTime AssignedTime { get; set; }
         public DateTime DueTo {  get; set; }
         public AssignedTestState State { get; set; }
+        public Guid AssignedBy { get; set; }
     }
 }

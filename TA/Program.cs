@@ -6,6 +6,7 @@ using Npgsql;
 using System.Text;
 using TA.Data;
 using TA.Data.Repositories;
+using TA.RestClients;
 using TA.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<AssignedTestsContext>(options => options.UseNpgsql(dataSource));
 builder.Services.AddScoped<ITestAssignerService, TestAssignerService>();
 builder.Services.AddScoped<IAssignedTestsRepository, AssignedTestsRepository>();
+builder.Services.AddScoped<ITAClient, TAClient>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

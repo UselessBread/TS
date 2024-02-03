@@ -8,5 +8,6 @@ namespace TS.Data.Contracts.Entities
         public string Name { get; set; } = string.Empty;
         public int TestContentId { get; set; }
         public Guid TestContentImmutableId { get; set; }
+        public Guid CrreatedBy { get; set; }
     }
 }

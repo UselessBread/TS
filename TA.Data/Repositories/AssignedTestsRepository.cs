@@ -14,8 +14,8 @@ namespace TA.Data.Repositories
 {
     public interface IAssignedTestsRepository
     {
-        public Task AssignTest(AssignTestRequestDto dto);
-        public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request)
+        public Task AssignTest(AssignTestRequestDto dto, Guid userId);
+        public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request);
     }
 
     public class AssignedTestsRepository : IAssignedTestsRepository
@@ -26,7 +26,7 @@ namespace TA.Data.Repositories
             _context = context;
         }
 
-        public async Task AssignTest(AssignTestRequestDto dto)
+        public async Task AssignTest(AssignTestRequestDto dto, Guid userId)
         {
             DateTime currentTime = DateTime.Now.ToUniversalTime();
 
@@ -40,6 +40,7 @@ namespace TA.Data.Repositories
                 State = AssignedTestState.Assigned,
                 StudentImmutableId = dto.StudentImmutableId,
                 TestDescriptionId = dto.TestDescriptionId,
+                AssignedBy = userId
             });
 
             await _context.SaveChangesAsync();
@@ -47,14 +48,14 @@ namespace TA.Data.Repositories
 
         public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request)
         {
-            var resultQuery = _context.AssignedTests.Where(t => t.DeletionDate == null
+            IQueryable<AssignedTests> resultQuery = _context.AssignedTests.Where(t => t.DeletionDate == null
             && t.StudentImmutableId == userId);
 
             if (groups != null && groups.Any())
             {
-                var addition = _context.AssignedTests.Where(t => t.DeletionDate == null && t.GroupImmutableId.HasValue
+                IQueryable<AssignedTests> addition = _context.AssignedTests.Where(t => t.DeletionDate == null && t.GroupImmutableId.HasValue
             && groups.Contains(t.GroupImmutableId.Value));
-                resultQuery.Union(addition);
+                resultQuery = resultQuery.Union(addition);
             }
 
             List<AssisgnedTestResponseDto> res = await resultQuery.Select(r => new AssisgnedTestResponseDto
@@ -62,6 +63,7 @@ namespace TA.Data.Repositories
                 AssignedTime = r.AssignedTime,
                 DueTo = r.DueTo,
                 TestDescriptionId = r.TestDescriptionId,
+                TeacherId = r.AssignedBy
             }).Skip(request.PageSize * (request.PageNumber - 1))
                 .Take(request.PageSize)
                 .ToListAsync();

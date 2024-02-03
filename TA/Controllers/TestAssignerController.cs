@@ -1,6 +1,7 @@
 ﻿using Common.Constants;
 using Common.Dto;
 using Common.Exceptions;
+using Common.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,19 +23,21 @@ namespace TA.Controllers
         }
 
         [HttpPost("assign")]
+        [Authorize(Roles = "Teacher")]
         public async Task AssignTest(AssignTestRequestDto dto)
         {
-            await _service.AssignTest(dto);
+            Guid userId = JwtTokenHelpers.GetUserIdFromToken(Request);
+
+            await _service.AssignTest(dto, userId);
         }
 
         [Authorize]
+        [HttpPost("getassignedtests")]
         public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(PaginationRequest request)
         {
-            string initialToken = Request.Headers.Authorization.FirstOrDefault(h => h.StartsWith("Bearer"))
-                ?? throw new AuthException("token cannot be empty");
-            string resultToken = initialToken.Replace("Bearer", "").Trim();
+            Guid userId = JwtTokenHelpers.GetUserIdFromToken(Request);
 
-            return await _service.GetAssignedTests(resultToken, request);
+            return await _service.GetAssignedTests(userId, request);
         }
     }
 }

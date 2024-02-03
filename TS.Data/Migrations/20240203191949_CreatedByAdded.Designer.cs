@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TS.Data;
@@ -13,9 +14,11 @@ using TS.Data.Contracts.DTO;
 namespace TS.Data.Migrations
 {
     [DbContext(typeof(TestsContext))]
-    partial class TestsContextModelSnapshot : ModelSnapshot
+    [Migration("20240203191949_CreatedByAdded")]
+    partial class CreatedByAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
