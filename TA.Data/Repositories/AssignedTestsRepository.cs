@@ -49,7 +49,7 @@ namespace TA.Data.Repositories
         public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request)
         {
             IQueryable<AssignedTests> resultQuery = _context.AssignedTests.Where(t => t.DeletionDate == null
-            && t.StudentImmutableId == userId);
+            && t.StudentImmutableId == userId || t.AssignedBy == userId);
 
             if (groups != null && groups.Any())
             {
