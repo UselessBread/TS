@@ -74,5 +74,11 @@ namespace IdentityService.Controllers
         {
             await _userService.UpdateGroup(dto);
         }
+
+        [HttpGet("getgroupsforuser")]
+        public async Task<List<Guid>> GetGroupsForUser(Guid userId)
+        {
+            return await _userService.GetGroupsForUser(userId);
+        }
     }
 }

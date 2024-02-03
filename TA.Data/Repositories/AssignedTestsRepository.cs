@@ -1,4 +1,7 @@
 ﻿using Common.Constants;
+using Common.Dto;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +15,7 @@ namespace TA.Data.Repositories
     public interface IAssignedTestsRepository
     {
         public Task AssignTest(AssignTestRequestDto dto);
+        public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request)
     }
 
     public class AssignedTestsRepository : IAssignedTestsRepository
@@ -39,6 +43,31 @@ namespace TA.Data.Repositories
             });
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request)
+        {
+            var resultQuery = _context.AssignedTests.Where(t => t.DeletionDate == null
+            && t.StudentImmutableId == userId);
+
+            if (groups != null && groups.Any())
+            {
+                var addition = _context.AssignedTests.Where(t => t.DeletionDate == null && t.GroupImmutableId.HasValue
+            && groups.Contains(t.GroupImmutableId.Value));
+                resultQuery.Union(addition);
+            }
+
+            List<AssisgnedTestResponseDto> res = await resultQuery.Select(r => new AssisgnedTestResponseDto
+            {
+                AssignedTime = r.AssignedTime,
+                DueTo = r.DueTo,
+                TestDescriptionId = r.TestDescriptionId,
+            }).Skip(request.PageSize * (request.PageNumber - 1))
+                .Take(request.PageSize)
+                .ToListAsync();
+            int itemsCount = await resultQuery.CountAsync();
+
+            return new PaginatedResponse<AssisgnedTestResponseDto>(res, itemsCount);
         }
     }
 }

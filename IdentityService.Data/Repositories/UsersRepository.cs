@@ -15,6 +15,7 @@ namespace IdentityService.Data.Repositories
         public Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto);
         public Task AddStudentsToGroupAsync(AddStudentsToGroupRequest dto);
         public Task UpdateGroup(UpdateGroupRequestDto dto);
+        public Task<List<Guid>> GetGroupsForUser(Guid userId);
 
     }
 
@@ -188,5 +189,9 @@ namespace IdentityService.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<Guid>> GetGroupsForUser(Guid userId)
+        {
+            return await _context.StudentsByGroups.Where(g=>g.StuedntId == userId).Select(res=>res.GroupImmutableId).ToListAsync();
+        }
     }
 }

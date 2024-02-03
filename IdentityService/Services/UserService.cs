@@ -23,6 +23,7 @@ namespace IdentityService.Services
         public Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto);
         public Task<FindUserResponseDto> GetUserById(Guid userId);
         public Task UpdateGroup(UpdateGroupRequestDto dto);
+        public Task<List<Guid>> GetGroupsForUser(Guid userId);
     }
 
     public class UserService : IUserService
@@ -106,7 +107,7 @@ namespace IdentityService.Services
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             List<Claim> claims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
-            claims.Add(new Claim("Id", user.Id.ToString()));
+            claims.Add(new Claim(JwtClaimsConstants.CLaimUserId, user.Id.ToString()));
 
             JwtSecurityToken token = new JwtSecurityToken(_config["Jwt:Issuer"],
                                              _config["Jwt:Audience"],
@@ -166,6 +167,11 @@ namespace IdentityService.Services
         public async Task UpdateGroup(UpdateGroupRequestDto dto)
         {
             await _usersRepository.UpdateGroup(dto);
+        }
+
+        public async Task<List<Guid>> GetGroupsForUser(Guid userId)
+        {
+            return await _usersRepository.GetGroupsForUser(userId);
         }
     }
 }
