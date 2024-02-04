@@ -1,12 +1,7 @@
 ﻿using Common.Constants;
 using Common.Dto;
+using Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TA.Data.Contracts.Dto;
 using TA.Data.Contracts.Entities;
 
@@ -29,6 +24,11 @@ namespace TA.Data.Repositories
         public async Task AssignTest(AssignTestRequestDto dto, Guid userId)
         {
             DateTime currentTime = DateTime.Now.ToUniversalTime();
+            if (_context.AssignedTests.Any(t => t.GroupImmutableId == dto.GroupImmutableId
+                && t.StudentImmutableId == dto.StudentImmutableId
+                && t.TestDescriptionId == dto.TestDescriptionId
+                && t.DeletionDate == null))
+                throw new BadRequestException("Test has been already assigned to this group");
 
             _context.AssignedTests.Add(new AssignedTests
             {
