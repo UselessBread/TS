@@ -2,6 +2,8 @@
 {
     public enum AssignedTestState
     {
-        Assigned
+        Assigned,
+        OnReview,
+        Reviewed
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Common.Dto;
 using Common.Exceptions;
+using Common.Extensions;
 using IdentityService.Data.Contracts.DTO;
 using IdentityService.Data.Contracts.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -44,8 +45,7 @@ namespace IdentityService.Data.Repositories
                 GroupImmutableId = r.GroupImmutableId
             });
 
-            int allEntriesCount = await request.CountAsync();
-            return new PaginatedResponse<GetAllGroupsResponseDto>(await request.ToListAsync(), allEntriesCount);
+            return await request.PaginateResult(paginationRequest);
         }
 
         public async Task<GetGroupInfoResponseDto> GetGroupInfoById(Guid immutableId)
@@ -65,7 +65,7 @@ namespace IdentityService.Data.Repositories
 
         public async Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest)
         {
-            var requestDto = paginationRequest.Request;
+            FindRequestDto requestDto = paginationRequest.Request;
             string roleToBeFound = string.Empty;
             switch (requestDto.UserType)
             {
@@ -98,20 +98,13 @@ namespace IdentityService.Data.Repositories
             if (!string.IsNullOrEmpty(requestDto.Surname))
                 joinedTables = joinedTables.Where(r => r.User.Surname.Contains(requestDto.Surname));
 
-            int allEntriesCount = await joinedTables.CountAsync();
-
-            List<FindUserResponseDto> res = joinedTables.Select(res => new FindUserResponseDto
+            return await joinedTables.Select(res => new FindUserResponseDto
             {
                 UserId = res.User.Id,
                 Surname = res.User.Surname,
                 Email = res.User.Email ?? string.Empty,
                 Name = res.User.Name
-            })
-                .Skip(paginationRequest.PageSize * (paginationRequest.PageNumber - 1))
-                .Take(paginationRequest.PageSize)
-                .ToList();
-
-            return new PaginatedResponse<FindUserResponseDto>(res, allEntriesCount);
+            }).PaginateResult(paginationRequest);
         }
 
         public async Task AddStudentsToGroupAsync(AddStudentsToGroupRequest dto)

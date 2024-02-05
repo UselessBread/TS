@@ -1,4 +1,6 @@
-﻿using Common.Exceptions;
+﻿using Common.Dto;
+using Common.Exceptions;
+using Common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using TS.Data.Contracts.DTO;
 using TS.Data.Contracts.Entities;
@@ -8,7 +10,7 @@ namespace TS.Data.Repositories
     public interface ITestsRepository
     {
         public Task CreateNewTest(CreateNewTestDto dto, Guid userId);
-        public Task<List<TestDescriptions>> GetAllDescriptions(Guid userId);
+        public Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(Guid userId, PaginationRequest paginationRequest);
 
         public Task<TestsContent> GetTestContentByDescriptionsId(Guid testDescriptionImmutableId);
         public Task Update(UpdateTestDto dto);
@@ -55,12 +57,12 @@ namespace TS.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<TestDescriptions>> GetAllDescriptions(Guid userId)
+        public async Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(Guid userId, PaginationRequest paginationRequest)
         {
-            return await _context.TestDescriptions
-                .Where(d => d.DeletionDate == null && d.CrreatedBy == userId)
-                .OrderBy(d => d.Id)
-                .ToListAsync();
+            IQueryable<TestDescriptions> resQuery = _context.TestDescriptions
+                .Where(d => d.DeletionDate == null && d.CrreatedBy == userId);
+
+            return await resQuery.PaginateResult(paginationRequest);
         }
 
         //TODO: Get content directly by content ID

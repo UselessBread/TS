@@ -1,4 +1,5 @@
-﻿using Common.Web.Helpers;
+﻿using Common.Dto;
+using Common.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TS.Data.Contracts.DTO;
@@ -30,11 +31,11 @@ namespace TS.Controllers
 
         //TODO: Use Pagination
         [Authorize(Roles = "Admin, Teacher")]
-        [HttpGet("descriptions")]
-        public async Task<List<TestDescriptions>> GetAllDescriptions()
+        [HttpPost("descriptions")]
+        public async Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(PaginationRequest paginationRequest)
         {
             Guid userId = JwtTokenHelpers.GetUserIdFromToken(Request);
-            return await _testsRepository.GetAllDescriptions(userId);
+            return await _testsRepository.GetAllDescriptions(userId, paginationRequest);
         }
 
         [HttpGet("content")]

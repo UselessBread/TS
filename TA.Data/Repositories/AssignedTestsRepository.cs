@@ -1,6 +1,7 @@
 ﻿using Common.Constants;
 using Common.Dto;
 using Common.Exceptions;
+using Common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using TA.Data.Contracts.Dto;
 using TA.Data.Contracts.Entities;
@@ -58,18 +59,14 @@ namespace TA.Data.Repositories
                 resultQuery = resultQuery.Union(addition);
             }
 
-            List<AssisgnedTestResponseDto> res = await resultQuery.Select(r => new AssisgnedTestResponseDto
+            return await resultQuery.Select(r => new AssisgnedTestResponseDto
             {
                 AssignedTime = r.AssignedTime,
                 DueTo = r.DueTo,
                 TestDescriptionId = r.TestDescriptionId,
                 TeacherId = r.AssignedBy
-            }).Skip(request.PageSize * (request.PageNumber - 1))
-                .Take(request.PageSize)
-                .ToListAsync();
-            int itemsCount = await resultQuery.CountAsync();
-
-            return new PaginatedResponse<AssisgnedTestResponseDto>(res, itemsCount);
+            })
+                .PaginateResult(request);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace TA.Data.Contracts.Dto
+﻿using Common.Constants;
+
+namespace TA.Data.Contracts.Dto
 {
     public class AssisgnedTestResponseDto
     {
@@ -6,5 +8,6 @@
         public int TestDescriptionId { get; set; }
         public DateTime AssignedTime { get; set; }
         public DateTime DueTo { get; set; }
+        public AssignedTestState State { get; set; }
     }
 }
