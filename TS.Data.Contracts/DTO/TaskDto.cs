@@ -1,4 +1,4 @@
-﻿using TS.Data.Contracts.Constants;
+﻿using Common.Constants;
 
 namespace TS.Data.Contracts.DTO
 {

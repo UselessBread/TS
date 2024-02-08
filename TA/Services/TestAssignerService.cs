@@ -9,6 +9,7 @@ namespace TA.Services
     {
         public Task AssignTest(AssignTestRequestDto dto, Guid userId);
         public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(Guid userId, PaginationRequest request);
+        public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
     }
 
     public class TestAssignerService : ITestAssignerService
@@ -32,6 +33,11 @@ namespace TA.Services
             List<Guid>? res = await _client.GetGroupsForUser(userId);
 
             return await _repository.GetAssignedTests(res, userId, request);
+        }
+
+        public async Task SaveAnswers(SaveAnswersDto dto, Guid userId)
+        {
+            await _repository.SaveAnswers(dto, userId);
         }
     }
 }

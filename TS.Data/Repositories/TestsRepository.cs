@@ -12,7 +12,9 @@ namespace TS.Data.Repositories
         public Task CreateNewTest(CreateNewTestDto dto, Guid userId);
         public Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(Guid userId, PaginationRequest paginationRequest);
 
-        public Task<TestsContent> GetTestContentByDescriptionsId(Guid testDescriptionImmutableId);
+        public Task<TestsContent> GetTestContentByDescriptionsImmutableId(Guid testDescriptionImmutableId);
+        public Task<TestsContent> GetTestContentByDescriptionsId(int testDescriptionId);
+        public Task<TestDescriptions> GetTestDescriptionById(int testDescriptionId);
         public Task Update(UpdateTestDto dto);
     }
 
@@ -65,13 +67,27 @@ namespace TS.Data.Repositories
             return await resQuery.PaginateResult(paginationRequest);
         }
 
+        public async Task<TestsContent> GetTestContentByDescriptionsId(int testDescriptionId)
+        {
+            TestDescriptions res = _context.TestDescriptions.FirstOrDefault(d => d.Id == testDescriptionId && d.DeletionDate == null) ??
+                throw new EntityNotFoundException($"No testContent with Id = {testDescriptionId} was found");
+
+            return await _context.TestsContent.OrderBy(c => c.Id).LastAsync(c => c.Id == res.TestContentId);
+        }
+
         //TODO: Get content directly by content ID
-        public async Task<TestsContent> GetTestContentByDescriptionsId(Guid testDescriptionImmutableId)
+        public async Task<TestsContent> GetTestContentByDescriptionsImmutableId(Guid testDescriptionImmutableId)
         {
             TestDescriptions res = _context.TestDescriptions.FirstOrDefault(d => d.ImmutableId == testDescriptionImmutableId && d.DeletionDate == null) ??
                 throw new EntityNotFoundException($"No testContent with ImmutableId = {testDescriptionImmutableId} was found");
 
             return await _context.TestsContent.OrderBy(c => c.Id).LastAsync(c => c.ImmutableId == res.TestContentImmutableId);
+        }
+
+        public async Task<TestDescriptions> GetTestDescriptionById(int testDescriptionId)
+        {
+            return await _context.TestDescriptions.FirstOrDefaultAsync(d => d.Id == testDescriptionId)
+                ?? throw new EntityNotFoundException($"No testContent with Id = {testDescriptionId} was found"); ;
         }
 
         public async Task Update(UpdateTestDto dto)

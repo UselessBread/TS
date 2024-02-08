@@ -1,4 +1,4 @@
-﻿namespace TS.Data.Contracts.Constants
+﻿namespace Common.Constants
 {
     public enum TestTypes
     {

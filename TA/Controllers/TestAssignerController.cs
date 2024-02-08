@@ -39,5 +39,14 @@ namespace TA.Controllers
 
             return await _service.GetAssignedTests(userId, request);
         }
+
+        [Authorize]
+        [HttpPost("saveanswers")]
+        public async Task SaveAnswers(SaveAnswersDto dto)
+        {
+            Guid userId = JwtTokenHelpers.GetUserIdFromToken(Request);
+
+            await _service.SaveAnswers(dto, userId);
+        }
     }
 }

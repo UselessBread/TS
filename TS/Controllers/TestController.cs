@@ -39,9 +39,21 @@ namespace TS.Controllers
         }
 
         [HttpGet("content")]
-        public async Task<TestsContent> GetTestContentByDescriptionsId([FromQuery] Guid testDescriptionImmutableId)
+        public async Task<TestsContent> GetTestContentByDescriptionsImmutableId([FromQuery] Guid testDescriptionImmutableId)
         {
-            return await _testsRepository.GetTestContentByDescriptionsId(testDescriptionImmutableId);
+            return await _testsRepository.GetTestContentByDescriptionsImmutableId(testDescriptionImmutableId);
+        }
+
+        [HttpGet("contentbyid")]
+        public async Task<TestsContent> GetTestContentByDescriptionsId([FromQuery] int taskDescriptionId)
+        {
+            return await _testsRepository.GetTestContentByDescriptionsId(taskDescriptionId);
+        }
+
+        [HttpGet("descriptionbyid")]
+        public async Task<TestDescriptions> GetTestDescriptionById([FromQuery] int testDescriptionId)
+        {
+            return await _testsRepository.GetTestDescriptionById(testDescriptionId);
         }
 
         [Authorize(Roles = "Admin, Teacher")]

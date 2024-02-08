@@ -12,6 +12,7 @@ namespace TA.Data.Repositories
     {
         public Task AssignTest(AssignTestRequestDto dto, Guid userId);
         public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request);
+        public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
     }
 
     public class AssignedTestsRepository : IAssignedTestsRepository
@@ -59,14 +60,34 @@ namespace TA.Data.Repositories
                 resultQuery = resultQuery.Union(addition);
             }
 
+            var completedTests = _context.StudentAnswers
+                .Where(a => a.UserId == userId)
+                .Select(res => res.AssignedTestImmutableId)
+                .ToList();
+
+            resultQuery = resultQuery.Where(r => !completedTests.Contains(r.ImmutableId));
+
             return await resultQuery.Select(r => new AssisgnedTestResponseDto
             {
                 AssignedTime = r.AssignedTime,
                 DueTo = r.DueTo,
                 TestDescriptionId = r.TestDescriptionId,
-                TeacherId = r.AssignedBy
+                TeacherId = r.AssignedBy,
+                AssignmentImmutableId = r.ImmutableId
             })
                 .PaginateResult(request);
+        }
+
+        public async Task SaveAnswers(SaveAnswersDto dto, Guid userId)
+        {
+            _context.StudentAnswers.Add(new StudentAnswer
+            {
+                Answers = dto.Tasks,
+                AssignedTestImmutableId = dto.AssignedTestImmutableId,
+                UserId = userId
+            });
+
+            await _context.SaveChangesAsync();
         }
     }
 }
