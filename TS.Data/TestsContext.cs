@@ -10,8 +10,12 @@ namespace TS.Data
         {
         }
 
-        public DbSet<TestDescriptions> TestDescriptions { get; set; }
-        public DbSet<TestsContent> TestsContent { get; set; }
+        public TestsContext()
+        {
+        }
+
+        public virtual DbSet<TestDescriptions> TestDescriptions { get; set; }
+        public virtual DbSet<TestsContent> TestsContent { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
