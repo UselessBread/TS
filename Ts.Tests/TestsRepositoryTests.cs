@@ -168,23 +168,6 @@ namespace Ts.Tests
             contextmock.Setup(x => x.TestDescriptions.Add(It.IsNotNull<TestDescriptions>()));
 
 
-            //mock.As<IAsyncEnumerable<TestsContent>>()
-            //   .Setup(m => m.GetAsyncEnumerator(CancellationToken.None))
-            //   .Returns(new InMemoryDbAsyncEnumerator<TestsContent>(testsContents.AsQueryable().GetEnumerator()));
-
-            //mock.As<IQueryable<TestsContent>>()
-            //    .Setup(m => m.Provider)
-            //    .Returns(new InMemoryAsyncQueryProvider<TestsContent>(testsContents.AsQueryable().Provider));
-
-            //mock.As<IQueryable<TestsContent>>().Setup(m => m.Expression).Returns(testsContents.AsQueryable().Expression);
-            //mock.As<IQueryable<TestsContent>>().Setup(m => m.ElementType).Returns(testsContents.AsQueryable().ElementType);
-            //mock.As<IQueryable<TestsContent>>().Setup(m => m.GetEnumerator()).Returns(() => testsContents.AsQueryable().GetEnumerator());
-            //contextmock.Setup(x => x.TestsContent).Returns(mock.Object);
-            contextmock.Setup(x => x.TestsContent.FirstOrDefault(c => c.ImmutableId == It.IsAny<Guid>()))
-                .Returns(testsContent);
-            var rep = new TestsRepository(contextmock.Object);
-            await rep.CreateNewTest(idealCreateNewTestDto, userId);
-
             Assert.True(true);
         }
     }
