@@ -19,7 +19,7 @@ namespace Ts.Tests
         [Fact]
         public async Task GetTestDescriptionById_Ok()
         {
-            TestDescriptions res = await _repos.GetTestDescriptionById(1);
+            TestDescriptions res = await _repos.GetTestDescriptionById(TSConstants.SecondContextDescription.Id);
 
             Assert.True(true);
         }
