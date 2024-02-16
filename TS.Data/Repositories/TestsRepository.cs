@@ -69,7 +69,7 @@ namespace TS.Data.Repositories
 
         public async Task<TestsContent> GetTestContentByDescriptionsId(int testDescriptionId)
         {
-            TestDescriptions res = _context.TestDescriptions.FirstOrDefault(d => d.Id == testDescriptionId && d.DeletionDate == null) ??
+            TestDescriptions res = _context.TestDescriptions.FirstOrDefault(d => d.Id == testDescriptionId) ??
                 throw new EntityNotFoundException($"No testContent with Id = {testDescriptionId} was found");
 
             return await _context.TestsContent.OrderBy(c => c.Id).LastAsync(c => c.Id == res.TestContentId);

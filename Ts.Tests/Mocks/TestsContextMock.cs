@@ -9,12 +9,12 @@ namespace Ts.Tests.Mocks
     public class TestsContextMock
     {
         
-        public TestsContext CreateMock()
+        public Mock<TestsContext> CreateMock()
         {
             List<TestsContent> testsContents =
             [
                 TSConstants.OldSingleOptionContent,
-                TSConstants.SingleOptionContent,
+                TSConstants.UpdSingleOptionContent,
                 TSConstants.MultipleOptionsContent,
                 TSConstants.TextOptionContent,
                 TSConstants.TextOptionContentByFirstUser,
@@ -36,7 +36,7 @@ namespace Ts.Tests.Mocks
                 .Setup(x=>x.TestDescriptions).ReturnsDbSet(testsDescriptions);
             testsContextMock.Setup(x => x.TestsContent).ReturnsDbSet(testsContents);
 
-            return testsContextMock.Object;
+            return testsContextMock;
         }
     }
 }

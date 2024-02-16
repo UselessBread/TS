@@ -9,7 +9,7 @@ namespace Ts.Tests.Constants
         public static Guid SecondUserGuid { get; } = Guid.NewGuid();
         public static Guid ThirdUserGuid { get; } = Guid.NewGuid();
 
-        public static TestsContent SingleOptionContent = new TestsContent
+        public static TestsContent UpdSingleOptionContent = new TestsContent
         {
             ImmutableId = Guid.NewGuid(),
             Id = 2,
@@ -71,9 +71,9 @@ namespace Ts.Tests.Constants
 
         public static TestsContent OldSingleOptionContent = new TestsContent
         {
-            ImmutableId = SingleOptionContent.ImmutableId,
+            ImmutableId = UpdSingleOptionContent.ImmutableId,
             Id = 1,
-            CreationDate = SingleOptionContent.CreationDate,
+            CreationDate = UpdSingleOptionContent.CreationDate,
             Tasks = new List<TaskDto>
                 {
                    new TaskDto
@@ -86,7 +86,7 @@ namespace Ts.Tests.Constants
                     }
                 },
             Version = 1,
-            DeletionDate = SingleOptionContent.CreationDate.AddHours(-1),
+            DeletionDate = UpdSingleOptionContent.CreationDate.AddHours(-1),
         };
 
         public static TestsContent TextOptionContentByFirstUser = new TestsContent
@@ -137,8 +137,8 @@ namespace Ts.Tests.Constants
             CrreatedBy = TSConstants.FirstUserGuid,
             DeletionDate = DateTime.Now.AddHours(1),
             ImmutableId = Guid.NewGuid(),
-            TestContentId = SingleOptionContent.Id,
-            TestContentImmutableId = SingleOptionContent.ImmutableId,
+            TestContentId = UpdSingleOptionContent.Id,
+            TestContentImmutableId = UpdSingleOptionContent.ImmutableId,
             Version = 1
         };
         public static TestDescriptions FirstUpdContextDescription = new TestDescriptions
@@ -148,9 +148,9 @@ namespace Ts.Tests.Constants
             CreationDate = FirstContextDescription.DeletionDate.Value,
             CrreatedBy = TSConstants.FirstUserGuid,
             DeletionDate = null,
-            ImmutableId = Guid.NewGuid(),
-            TestContentId = SingleOptionContent.Id,
-            TestContentImmutableId = SingleOptionContent.ImmutableId,
+            ImmutableId = FirstContextDescription.ImmutableId,
+            TestContentId = UpdSingleOptionContent.Id,
+            TestContentImmutableId = UpdSingleOptionContent.ImmutableId,
             Version = 2
         };
         public static TestDescriptions SecondContextDescription = new TestDescriptions
