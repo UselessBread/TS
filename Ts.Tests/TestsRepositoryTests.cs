@@ -1,9 +1,13 @@
+using Common.Constants;
 using Common.Dto;
 using Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using Moq;
+using Moq.EntityFrameworkCore.DbAsyncQueryProvider;
 using Ts.Tests.Constants;
 using Ts.Tests.Mocks;
 using TS.Data;
+using TS.Data.Contracts.DTO;
 using TS.Data.Contracts.Entities;
 using TS.Data.Repositories;
 
@@ -111,6 +115,77 @@ namespace Ts.Tests
         public async Task GetTestContentByDescriptionsImmutableId_WrongImmutableId_ThrowsException()
         {
             await Assert.ThrowsAsync<EntityNotFoundException>(() => _repos.GetTestContentByDescriptionsImmutableId(Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task CreateNewTest_Ok()
+        {
+            Guid userId = Guid.NewGuid();
+            CreateNewTestDto idealCreateNewTestDto = new CreateNewTestDto
+            {
+                TestName = "Created via test",
+                Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+            };
+
+            //await _repos.CreateNewTest(idealCreateNewTestDto, userId);
+            TestsContent testsContent = new TestsContent()
+            {
+                Tasks = idealCreateNewTestDto.Tasks,
+                CreationDate = DateTime.Now,
+                ImmutableId = Guid.NewGuid(),
+                Version = 1,
+            };
+            List<TestsContent> testsContents = new List<TestsContent> { testsContent };
+            Mock<TestsContext> contextmock = new Mock<TestsContext>();
+            Mock<DbSet<TestsContent>> mock = new Mock<DbSet<TestsContent>>();
+            contextmock.Setup(x => x.TestsContent.Add(It.IsNotNull<TestsContent>()));
+            contextmock.Setup(x => x.TestDescriptions.Add(It.IsNotNull<TestDescriptions>()));
+
+
+            //mock.As<IAsyncEnumerable<TestsContent>>()
+            //   .Setup(m => m.GetAsyncEnumerator(CancellationToken.None))
+            //   .Returns(new InMemoryDbAsyncEnumerator<TestsContent>(testsContents.AsQueryable().GetEnumerator()));
+
+            //mock.As<IQueryable<TestsContent>>()
+            //    .Setup(m => m.Provider)
+            //    .Returns(new InMemoryAsyncQueryProvider<TestsContent>(testsContents.AsQueryable().Provider));
+
+            //mock.As<IQueryable<TestsContent>>().Setup(m => m.Expression).Returns(testsContents.AsQueryable().Expression);
+            //mock.As<IQueryable<TestsContent>>().Setup(m => m.ElementType).Returns(testsContents.AsQueryable().ElementType);
+            //mock.As<IQueryable<TestsContent>>().Setup(m => m.GetEnumerator()).Returns(() => testsContents.AsQueryable().GetEnumerator());
+            //contextmock.Setup(x => x.TestsContent).Returns(mock.Object);
+            contextmock.Setup(x => x.TestsContent.FirstOrDefault(c => c.ImmutableId == It.IsAny<Guid>()))
+                .Returns(testsContent);
+            var rep = new TestsRepository(contextmock.Object);
+            await rep.CreateNewTest(idealCreateNewTestDto, userId);
+
+            Assert.True(true);
         }
     }
 }

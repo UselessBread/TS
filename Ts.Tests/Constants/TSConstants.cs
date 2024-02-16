@@ -1,10 +1,12 @@
-﻿using TS.Data.Contracts.DTO;
+﻿using Common.Constants;
+using TS.Data.Contracts.DTO;
 using TS.Data.Contracts.Entities;
 
 namespace Ts.Tests.Constants
 {
     public static class TSConstants
     {
+        #region get methods
         public static Guid FirstUserGuid { get; } = Guid.NewGuid();
         public static Guid SecondUserGuid { get; } = Guid.NewGuid();
         public static Guid ThirdUserGuid { get; } = Guid.NewGuid();
@@ -204,5 +206,45 @@ namespace Ts.Tests.Constants
             TestContentImmutableId = TextOptionContentByFirstUserThird.ImmutableId,
             Version = 1
         };
+        #endregion
+
+        #region create
+        public static Guid CreateUserId = Guid.NewGuid();
+        public static CreateNewTestDto IdealCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        //public static TestsContent IdealCreateNewTestsContent = new
+        //{
+
+        //}
+        #endregion
     }
 }
