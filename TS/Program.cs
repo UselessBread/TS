@@ -6,6 +6,7 @@ using Npgsql;
 using System.Text;
 using TS.Data;
 using TS.Data.Repositories;
+using TS.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,7 @@ var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<TestsContext>(options => options.UseNpgsql(dataSource));
 builder.Services.AddScoped<ITestDescriptionsRepository, TestDescriptionsRepository>();
 builder.Services.AddScoped<ITestsContentRepository, TestsContentRepository>();
+builder.Services.AddScoped<ITestsService, TestsService>();
 
 //JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
