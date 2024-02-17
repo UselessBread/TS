@@ -18,7 +18,8 @@ var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;D
     .EnableDynamicJson();
 var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<TestsContext>(options => options.UseNpgsql(dataSource));
-builder.Services.AddScoped<ITestsRepository, TestsRepository>();
+builder.Services.AddScoped<ITestDescriptionsRepository, TestDescriptionsRepository>();
+builder.Services.AddScoped<ITestsContentRepository, TestsContentRepository>();
 
 //JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

@@ -9,13 +9,13 @@ namespace TS.Data.Repositories
 {
     public interface ITestsRepository
     {
-        public Task CreateNewTest(CreateNewTestDto dto, Guid userId);
-        public Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(Guid userId, PaginationRequest paginationRequest);
+        //public Task CreateNewTest(CreateNewTestDto dto, Guid userId);
+        //public Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(Guid userId, PaginationRequest paginationRequest);
 
-        public Task<TestsContent> GetTestContentByDescriptionsImmutableId(Guid testDescriptionImmutableId);
-        public Task<TestsContent> GetTestContentByDescriptionsId(int testDescriptionId);
-        public Task<TestDescriptions> GetTestDescriptionById(int testDescriptionId);
-        public Task Update(UpdateTestDto dto);
+        //public Task<TestsContent> GetTestContentByDescriptionsImmutableId(Guid testDescriptionImmutableId);
+        //public Task<TestsContent> GetTestContentByDescriptionsId(int testDescriptionId);
+        //public Task<TestDescriptions> GetTestDescriptionById(int testDescriptionId);
+        //public Task Update(UpdateTestDto dto);
     }
 
     public class TestsRepository : ITestsRepository
