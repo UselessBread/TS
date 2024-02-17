@@ -14,30 +14,35 @@ namespace TA.Services
 
     public class TestAssignerService : ITestAssignerService
     {
-        private readonly IAssignedTestsRepository _repository;
+        private readonly IAssignmentRepository _assignmentRepository;
+        private readonly IStudentAnswersRepository _studentAnswersRepository;
         private readonly ITAClient _client;
 
-        public TestAssignerService(IAssignedTestsRepository repository, ITAClient client)
+        public TestAssignerService(ITAClient client,
+                                   IAssignmentRepository assignmentRepository,
+                                   IStudentAnswersRepository studentAnswersRepository)
         {
-            _repository = repository;
             _client = client;
+            _assignmentRepository = assignmentRepository;
+            _studentAnswersRepository = studentAnswersRepository;
         }
 
         public async Task AssignTest(AssignTestRequestDto dto, Guid userId)
         {
-            await _repository.AssignTest(dto, userId);
+            await _assignmentRepository.AssignTest(dto, userId);
         }
 
         public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(Guid userId, PaginationRequest request)
         {
             List<Guid>? res = await _client.GetGroupsForUser(userId);
+            var completedTests = await _studentAnswersRepository.GetCompletedTests(userId);
 
-            return await _repository.GetAssignedTests(res, userId, request);
+            return await _assignmentRepository.GetAssignedTests(res, userId, request, completedTests);
         }
 
         public async Task SaveAnswers(SaveAnswersDto dto, Guid userId)
         {
-            await _repository.SaveAnswers(dto, userId);
+            await _studentAnswersRepository.SaveAnswers(dto, userId);
         }
     }
 }

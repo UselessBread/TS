@@ -20,7 +20,9 @@ var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;D
 var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<AssignedTestsContext>(options => options.UseNpgsql(dataSource));
 builder.Services.AddScoped<ITestAssignerService, TestAssignerService>();
-builder.Services.AddScoped<IAssignedTestsRepository, AssignedTestsRepository>();
+builder.Services.AddScoped<IStudentAnswersRepository, StudentAnswersRepository>();
+builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ITAClient, TAClient>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

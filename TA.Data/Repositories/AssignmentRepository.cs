@@ -2,23 +2,26 @@
 using Common.Dto;
 using Common.Exceptions;
 using Common.Extensions;
-using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using TA.Data.Contracts.Dto;
 using TA.Data.Contracts.Entities;
 
 namespace TA.Data.Repositories
 {
-    public interface IAssignedTestsRepository
+    public interface IAssignmentRepository
     {
         public Task AssignTest(AssignTestRequestDto dto, Guid userId);
-        public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request);
-        public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
+        public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request, List<Guid> completedTests);
     }
-
-    public class AssignedTestsRepository : IAssignedTestsRepository
+    public class AssignmentRepository : IAssignmentRepository
     {
         private readonly AssignedTestsContext _context;
-        public AssignedTestsRepository(AssignedTestsContext context)
+
+        public AssignmentRepository(AssignedTestsContext context)
         {
             _context = context;
         }
@@ -48,7 +51,7 @@ namespace TA.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request)
+        public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request, List<Guid> completedTests)
         {
             IQueryable<AssignedTests> resultQuery = _context.AssignedTests.Where(t => t.DeletionDate == null
             && t.StudentImmutableId == userId || t.AssignedBy == userId);
@@ -59,11 +62,6 @@ namespace TA.Data.Repositories
             && groups.Contains(t.GroupImmutableId.Value));
                 resultQuery = resultQuery.Union(addition);
             }
-
-            var completedTests = _context.StudentAnswers
-                .Where(a => a.UserId == userId)
-                .Select(res => res.AssignedTestImmutableId)
-                .ToList();
 
             resultQuery = resultQuery.Where(r => !completedTests.Contains(r.ImmutableId));
 
@@ -76,18 +74,6 @@ namespace TA.Data.Repositories
                 AssignmentImmutableId = r.ImmutableId
             })
                 .PaginateResult(request);
-        }
-
-        public async Task SaveAnswers(SaveAnswersDto dto, Guid userId)
-        {
-            _context.StudentAnswers.Add(new StudentAnswer
-            {
-                Answers = dto.Tasks,
-                AssignedTestImmutableId = dto.AssignedTestImmutableId,
-                UserId = userId
-            });
-
-            await _context.SaveChangesAsync();
         }
     }
 }
