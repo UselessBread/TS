@@ -1,8 +1,8 @@
 using Common.Constants;
 using Common.Dto;
 using Common.Exceptions;
-using Microsoft.EntityFrameworkCore;
 using Moq;
+using System.Linq.Expressions;
 using Ts.Tests.Constants;
 using Ts.Tests.Mocks;
 using TS.Data;
@@ -15,13 +15,26 @@ namespace Ts.Tests
 {
     public class TestsRepositoryTests
     {
-        TestsService _service;
+        private TestsService _service;
+        private TestsService _mockedService;
+        private TestsContentRepository _contentRepos;
+        private TestDescriptionsRepository _descriptionsRepos;
+        private Mock<TestsContext> _contextMock;
         public TestsRepositoryTests()
         {
-            Mock<TestsContext> contextMock = new TestsContextMock().CreateMock();
-            TestsContentRepository contentRepos = new TestsContentRepository(contextMock.Object);
-            TestDescriptionsRepository DescriptionsRepos = new TestDescriptionsRepository(contextMock.Object);
-            _service = new TestsService(null,contentRepos, DescriptionsRepos);
+            _contextMock = new TestsContextMock().CreateMock();
+            _contentRepos = new TestsContentRepository(_contextMock.Object);
+            _descriptionsRepos = new TestDescriptionsRepository(_contextMock.Object);
+            _service = new TestsService(null, _contentRepos, _descriptionsRepos);
+
+            var contentMock = new Mock<ITestsContentRepository>();
+            contentMock.Setup(m => m.Create(It.IsAny<List<TaskDto>>()))
+                .Returns(Task.FromResult(Guid.NewGuid()));
+            contentMock.Setup(m => m.GetByImmutableId(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new TestsContent()));
+
+            var descrMock = new Mock<ITestDescriptionsRepository>();
+            _mockedService = new TestsService(null, contentMock.Object, descrMock.Object);
         }
 
         [Fact]
@@ -114,58 +127,143 @@ namespace Ts.Tests
             await Assert.ThrowsAsync<EntityNotFoundException>(() => _service.GetTestContentByDescriptionsImmutableId(Guid.NewGuid()));
         }
 
-        //[Fact]
-        //public async Task CreateNewTest_Ok()
-        //{
-        //    Guid userId = Guid.NewGuid();
-        //    CreateNewTestDto idealCreateNewTestDto = new CreateNewTestDto
-        //    {
-        //        TestName = "Created via test",
-        //        Tasks = new List<TaskDto>
-        //        {
-        //            new TaskDto
-        //            {
-        //                Answers = new List<string>{"fst","sec","third"},
-        //                Position = 0,
-        //                RightAnswers = new List<int>{1},
-        //                TaskDescription = "Descr",
-        //                Type = TestTypes.SingleOption
-        //            },
-        //            new TaskDto
-        //            {
-        //                Answers = new List<string>{"fst","sec","third"},
-        //                Position = 1,
-        //                RightAnswers = new List<int>{1,2},
-        //                TaskDescription = "Descr",
-        //                Type = TestTypes.MultipleOptions
-        //            },
-        //            new TaskDto
-        //            {
-        //                Answers = null,
-        //                Position = 2,
-        //                RightAnswers = null,
-        //                TaskDescription = "Descr",
-        //                Type = TestTypes.Text
-        //            }
-        //        }
-        //    };
+        [Fact]
+        public async Task CreateNewTest_Ok()
+        {
+            Guid userId = Guid.NewGuid();
+            CreateNewTestDto idealCreateNewTestDto = new CreateNewTestDto
+            {
+                TestName = "Created via test",
+                Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+            };
 
-        //    //await _repos.CreateNewTest(idealCreateNewTestDto, userId);
-        //    TestsContent testsContent = new TestsContent()
-        //    {
-        //        Tasks = idealCreateNewTestDto.Tasks,
-        //        CreationDate = DateTime.Now,
-        //        ImmutableId = Guid.NewGuid(),
-        //        Version = 1,
-        //    };
-        //    List<TestsContent> testsContents = new List<TestsContent> { testsContent };
-        //    Mock<TestsContext> contextmock = new Mock<TestsContext>();
-        //    Mock<DbSet<TestsContent>> mock = new Mock<DbSet<TestsContent>>();
-        //    contextmock.Setup(x => x.TestsContent.Add(It.IsNotNull<TestsContent>()));
-        //    contextmock.Setup(x => x.TestDescriptions.Add(It.IsNotNull<TestDescriptions>()));
+            TestsContent testsContent = new TestsContent()
+            {
+                Tasks = idealCreateNewTestDto.Tasks,
+                CreationDate = DateTime.Now,
+                ImmutableId = Guid.NewGuid(),
+                Version = 1,
+            };
 
+            Guid id = await _contentRepos.Create(idealCreateNewTestDto.Tasks);
+            await _descriptionsRepos.Create(1, id, idealCreateNewTestDto, userId);
 
-        //    Assert.True(true);
-        //}
+            Expression<Func<TestsContent, bool>> contentMatcher = arg => arg.Tasks == idealCreateNewTestDto.Tasks
+            && arg.Version == 1;
+            _contextMock.Verify(m => m.TestsContent.Add(It.Is(contentMatcher)));
+
+            Expression<Func<TestDescriptions, bool>> descriptionMatcher = arg => arg.CrreatedBy == userId
+            && arg.TestContentImmutableId == id
+            && arg.Version == 1
+            && arg.TestContentId == 1
+            && arg.Name == idealCreateNewTestDto.TestName;
+            _contextMock.Verify(m => m.TestDescriptions.Add(It.Is(descriptionMatcher)));
+
+            Assert.True(true);
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_Ok()
+        {
+
+            await _mockedService.CreateNewTest(TSConstants.IdealCreateNewTestDto, Guid.NewGuid());
+            Assert.True(true);
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_WrongPosition_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.WrongPositionCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_HaveRightAnswersInTextOption_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.HaveRightAnswersInTextCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_HaveAnswersInTextOption_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.HaveAnswersInTextCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_DoesNotHaveRightAnsersInSingle_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.DoesNotHaveRightAnsersInSingleCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_DoesNotHaveAnsersInSingle_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.DoesNotHaveAnsersInSingleCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_MultipleRightAnsersInSingle_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.MultipleRightAnswersSingleCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_OutOfRangeRightAnsersInSingle_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.OutOfRangeRightAnswersSingleCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_DoesNotHaveRightAnsersInMult_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.DoesNotHaveRightAnsersInMultCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_DoesNotHaveAnsersInMult_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.DoesNotHaveAnsersInMultCreateNewTestDto, Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task TaskDtoValidation_OutOfRangeRightAnsersInMult_ThrowsException()
+        {
+            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            _mockedService.CreateNewTest(TSConstants.OutOfRangeRightAnsersInMultCreateNewTestDto, Guid.NewGuid()));
+        }
     }
 }

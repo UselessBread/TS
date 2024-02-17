@@ -210,6 +210,7 @@ namespace Ts.Tests.Constants
 
         #region create
         public static Guid CreateUserId = Guid.NewGuid();
+
         public static CreateNewTestDto IdealCreateNewTestDto = new CreateNewTestDto
         {
             TestName = "Created via test",
@@ -241,10 +242,317 @@ namespace Ts.Tests.Constants
                     }
                 }
         };
-        //public static TestsContent IdealCreateNewTestsContent = new
-        //{
+        public static CreateNewTestDto WrongPositionCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 3,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        public static CreateNewTestDto HaveRightAnswersInTextCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        public static CreateNewTestDto HaveAnswersInTextCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{ "te,p"},
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        public static CreateNewTestDto DoesNotHaveRightAnsersInSingleCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        public static CreateNewTestDto DoesNotHaveAnsersInSingleCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        public static CreateNewTestDto MultipleRightAnswersSingleCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        public static CreateNewTestDto OutOfRangeRightAnswersSingleCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{5},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
 
-        //}
+        public static CreateNewTestDto DoesNotHaveRightAnsersInMultCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        public static CreateNewTestDto DoesNotHaveAnsersInMultCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 1,
+                        RightAnswers = new List<int>{1,2},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
+        public static CreateNewTestDto OutOfRangeRightAnsersInMultCreateNewTestDto = new CreateNewTestDto
+        {
+            TestName = "Created via test",
+            Tasks = new List<TaskDto>
+                {
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 0,
+                        RightAnswers = new List<int>{1},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.SingleOption
+                    },
+                    new TaskDto
+                    {
+                        Answers = new List<string>{"fst","sec","third"},
+                        Position = 1,
+                        RightAnswers = new List<int>{1,5},
+                        TaskDescription = "Descr",
+                        Type = TestTypes.MultipleOptions
+                    },
+                    new TaskDto
+                    {
+                        Answers = null,
+                        Position = 2,
+                        RightAnswers = null,
+                        TaskDescription = "Descr",
+                        Type = TestTypes.Text
+                    }
+                }
+        };
         #endregion
     }
 }
