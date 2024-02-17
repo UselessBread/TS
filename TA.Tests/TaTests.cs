@@ -1,6 +1,7 @@
 using Common.Dto;
 using Moq;
 using TA.Data;
+using TA.Data.Contracts.Dto;
 using TA.Data.Repositories;
 using TA.Services;
 using TA.Tests.Constants;
@@ -23,9 +24,9 @@ namespace TA.Tests
         }
 
         [Fact]
-        public async Task Test1Async()
+        public async Task GetAssignedTests_Ok()
         {
-            PaginatedResponse<Data.Contracts.Dto.AssisgnedTestResponseDto> res = await _service.GetAssignedTests(DbMockConstants.FirstStudentImmutableId, new PaginationRequest(1, 10));
+            PaginatedResponse<AssisgnedTestResponseDto> res = await _service.GetAssignedTests(DbMockConstants.FirstStudentImmutableId, new PaginationRequest(1, 10));
 
             Assert.True(true);
         }
