@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Common.Exceptions
 {
-    public class InvelidDataException : VerbalizedException
+    public class InvalidContentException : VerbalizedException
     {
-        public InvelidDataException(Exception? innerException, string message) :
+        public InvalidContentException(Exception? innerException, string message) :
             base(innerException, ErrorCodes.AuthException, message)
         { }
-        public InvelidDataException(string message) :
+        public InvalidContentException(string message) :
             base(null, ErrorCodes.AuthException, message)
         { }
     }

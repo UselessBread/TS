@@ -199,70 +199,70 @@ namespace Ts.Tests
         [Fact]
         public async Task TaskDtoValidation_WrongPosition_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.WrongPositionCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_HaveRightAnswersInTextOption_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.HaveRightAnswersInTextCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_HaveAnswersInTextOption_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.HaveAnswersInTextCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_DoesNotHaveRightAnsersInSingle_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.DoesNotHaveRightAnsersInSingleCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_DoesNotHaveAnsersInSingle_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.DoesNotHaveAnsersInSingleCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_MultipleRightAnsersInSingle_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.MultipleRightAnswersSingleCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_OutOfRangeRightAnsersInSingle_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.OutOfRangeRightAnswersSingleCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_DoesNotHaveRightAnsersInMult_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.DoesNotHaveRightAnsersInMultCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_DoesNotHaveAnsersInMult_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.DoesNotHaveAnsersInMultCreateNewTestDto, Guid.NewGuid()));
         }
 
         [Fact]
         public async Task TaskDtoValidation_OutOfRangeRightAnsersInMult_ThrowsException()
         {
-            await Assert.ThrowsAsync<InvelidDataException>(() =>
+            await Assert.ThrowsAsync<InvalidContentException>(() =>
             _mockedService.CreateNewTest(TSConstants.OutOfRangeRightAnsersInMultCreateNewTestDto, Guid.NewGuid()));
         }
     }

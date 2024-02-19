@@ -1,4 +1,5 @@
 ﻿using Common.Dto;
+using Common.Exceptions;
 using TA.Data.Contracts.Dto;
 using TA.Data.Repositories;
 using TA.RestClients;
@@ -29,6 +30,10 @@ namespace TA.Services
 
         public async Task AssignTest(AssignTestRequestDto dto, Guid userId)
         {
+            if(dto.GroupImmutableId == null && dto.StudentImmutableId == null)
+            {
+                throw new BadRequestException("group or student must be assigned");
+            }
             await _assignmentRepository.AssignTest(dto, userId);
         }
 
@@ -40,8 +45,22 @@ namespace TA.Services
             return await _assignmentRepository.GetAssignedTests(res, userId, request, completedTests);
         }
 
+        // TODO: Add more checks for answers to be right according to the test types
         public async Task SaveAnswers(SaveAnswersDto dto, Guid userId)
         {
+            var orederdAnswers = dto.Tasks.OrderBy(a => a.Position);
+            int position = -1;
+            foreach (var answer in orederdAnswers)
+            {
+                if(answer.Position == position + 1)
+                {
+                    position = answer.Position;
+                }
+                else
+                {
+                    throw new InvalidContentException("wrong positions");
+                }
+            }
             await _studentAnswersRepository.SaveAnswers(dto, userId);
         }
     }

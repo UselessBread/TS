@@ -119,7 +119,7 @@ namespace IdentityService.Services
             return new SignInResponseDto
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
-                UserName = user.UserName ?? throw new InvelidDataException("UserName cannot be null"),
+                UserName = user.UserName ?? throw new InvalidContentException("UserName cannot be null"),
                 Role = roles.First()
             };
         }

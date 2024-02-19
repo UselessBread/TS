@@ -77,7 +77,7 @@ namespace TS.Services
             foreach (var task in orderedTasks)
             {
                 if (task.Position != prevPosition + 1)
-                    throw new InvelidDataException("invalid task positions");
+                    throw new InvalidContentException("invalid task positions");
 
                 prevPosition = task.Position;
 
@@ -85,24 +85,24 @@ namespace TS.Services
                 {
                     case Common.Constants.TestTypes.Text:
                         if (task.RightAnswers != null || task.Answers != null)
-                            throw new InvelidDataException($"invalid data content for the task with the type == {task.Type}");
+                            throw new InvalidContentException($"invalid data content for the task with the type == {task.Type}");
                         break;
                     case Common.Constants.TestTypes.SingleOption:
                         if ((task.RightAnswers == null || task.Answers == null) || (task.RightAnswers.Count != 1 && task.Answers.Count != 1))
-                            throw new InvelidDataException($"invalid data content for the task with the type == {task.Type}");
+                            throw new InvalidContentException($"invalid data content for the task with the type == {task.Type}");
 
                         if (task.RightAnswers.First() >= task.Answers.Count)
-                            throw new InvelidDataException($"invalid data content for the task with the type == {task.Type}");
+                            throw new InvalidContentException($"invalid data content for the task with the type == {task.Type}");
 
                         break;
                     case Common.Constants.TestTypes.MultipleOptions:
                         if ((task.RightAnswers == null || task.Answers == null) || (task.RightAnswers.Count == 0 && task.Answers.Count == 0))
-                            throw new InvelidDataException($"invalid data content for the task with the type == {task.Type}");
+                            throw new InvalidContentException($"invalid data content for the task with the type == {task.Type}");
 
                         foreach (int rightAnswer in task.RightAnswers)
                         {
                             if (rightAnswer >= task.Answers.Count)
-                                throw new InvelidDataException($"invalid data content for the task with the type == {task.Type}");
+                                throw new InvalidContentException($"invalid data content for the task with the type == {task.Type}");
                         }
                         break;
                 }
