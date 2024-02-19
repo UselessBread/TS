@@ -2,6 +2,7 @@
 using Common.Dto;
 using Common.Exceptions;
 using Common.Extensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace TA.Data.Repositories
     {
         public Task AssignTest(AssignTestRequestDto dto, Guid userId);
         public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request, List<Guid> completedTests);
+        public Task<AssignedTests> GetByImmutableId(Guid immutableId);
+        public Task ChangeState(AssignedTests entity, AssignedTestState state);
     }
     public class AssignmentRepository : IAssignmentRepository
     {
@@ -75,5 +78,35 @@ namespace TA.Data.Repositories
             })
                 .PaginateResult(request);
         }
+
+        public async Task<AssignedTests> GetByImmutableId(Guid immutableId)
+        {
+            return await _context.AssignedTests.FirstOrDefaultAsync(a => a.ImmutableId == immutableId && a.DeletionDate == null)
+                ?? throw new EntityNotFoundException($"Cannot find AssignedTests entity with ImmutableId = {immutableId}");
+        }
+
+        public async Task ChangeState(AssignedTests entity, AssignedTestState state)
+        {
+            DateTime current = DateTime.Now.ToUniversalTime();
+            entity.DeletionDate = current;
+
+            AssignedTests updated = new AssignedTests
+            {
+                AssignedBy = entity.AssignedBy,
+                AssignedTime = entity.AssignedTime,
+                CreationDate = current,
+                DueTo = entity.DueTo,
+                TestDescriptionId = entity.TestDescriptionId,
+                GroupImmutableId = entity.GroupImmutableId,
+                ImmutableId = entity.ImmutableId,
+                State = state,
+                StudentImmutableId = entity.StudentImmutableId,
+                Version = entity.Version + 1
+            };
+
+            await _context.AddAsync(updated);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

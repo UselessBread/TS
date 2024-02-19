@@ -13,6 +13,7 @@ namespace TA.Data.Repositories
     {
         public Task<List<Guid>> GetCompletedTests(Guid userId);
         public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
+        public Task<bool> CheckForAssignmentCompletion(List<Guid> userIds, Guid assignmentImmutableId);
     }
     public class StudentAnswersRepository : IStudentAnswersRepository
     {
@@ -39,6 +40,14 @@ namespace TA.Data.Repositories
             });
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> CheckForAssignmentCompletion(List<Guid> userIds, Guid assignmentImmutableId)
+        {
+            var res = await _context.StudentAnswers.Where(a => userIds.Contains(a.UserId)
+                && a.AssignedTestImmutableId == assignmentImmutableId).CountAsync();
+
+            return res == userIds.Count;
         }
     }
 }

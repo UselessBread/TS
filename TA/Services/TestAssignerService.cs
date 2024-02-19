@@ -1,6 +1,8 @@
 ﻿using Common.Dto;
 using Common.Exceptions;
+using IdentityService.Data.Contracts.DTO;
 using TA.Data.Contracts.Dto;
+using TA.Data.Contracts.Entities;
 using TA.Data.Repositories;
 using TA.RestClients;
 
@@ -62,6 +64,22 @@ namespace TA.Services
                 }
             }
             await _studentAnswersRepository.SaveAnswers(dto, userId);
+
+            AssignedTests assignment = await _assignmentRepository.GetByImmutableId(dto.AssignedTestImmutableId);
+
+            if (assignment.GroupImmutableId.HasValue)
+            {
+                GetGroupInfoResponseDto groupInfo = await _client.GetGroupInfoById(assignment.GroupImmutableId.Value);
+                if (await _studentAnswersRepository.CheckForAssignmentCompletion(groupInfo.StudentIds, assignment.ImmutableId))
+                {
+                    await _assignmentRepository.ChangeState(assignment, Common.Constants.AssignedTestState.OnReview);
+                }
+            }
+            else
+            {
+                await _assignmentRepository.ChangeState(assignment, Common.Constants.AssignedTestState.OnReview);
+            }
+
         }
     }
 }
