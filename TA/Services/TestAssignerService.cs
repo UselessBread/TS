@@ -13,6 +13,7 @@ namespace TA.Services
         public Task AssignTest(AssignTestRequestDto dto, Guid userId);
         public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(Guid userId, PaginationRequest request);
         public Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest);
+        public Task<AssisgnedTestResponseDto> GetAssignmentByImmutableId(Guid immutableId);
         public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
     }
 
@@ -43,7 +44,7 @@ namespace TA.Services
         public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(Guid userId, PaginationRequest request)
         {
             List<Guid>? res = await _client.GetGroupsForUser(userId);
-            var completedTests = await _studentAnswersRepository.GetCompletedTests(userId);
+            List<Guid> completedTests = await _studentAnswersRepository.GetCompletedTests(userId);
 
             return await _assignmentRepository.GetAssignedTests(res, userId, request, completedTests);
         }
@@ -53,10 +54,25 @@ namespace TA.Services
             return await _studentAnswersRepository.GetTestDescriptionsForReview(paginationRequest);
         }
 
+        public async Task<AssisgnedTestResponseDto> GetAssignmentByImmutableId(Guid immutableId)
+        {
+            var res = await _assignmentRepository.GetByImmutableId(immutableId);
+
+            return new AssisgnedTestResponseDto
+            {
+                AssignedTime = res.AssignedTime,
+                AssignmentImmutableId = res.ImmutableId,
+                DueTo = res.DueTo,
+                State = res.State,
+                TeacherId = res.AssignedBy,
+                TestDescriptionId = res.TestDescriptionId
+            };
+        }
+
         // TODO: Add more checks for answers to be right according to the test types
         public async Task SaveAnswers(SaveAnswersDto dto, Guid userId)
         {
-            var orederdAnswers = dto.Tasks.OrderBy(a => a.Position);
+            IOrderedEnumerable<Answer> orederdAnswers = dto.Tasks.OrderBy(a => a.Position);
             int position = -1;
             foreach (var answer in orederdAnswers)
             {

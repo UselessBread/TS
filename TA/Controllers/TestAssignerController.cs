@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TA.Data.Contracts.Dto;
+using TA.Data.Contracts.Entities;
 using TA.Services;
 
 namespace TA.Controllers
@@ -54,6 +55,13 @@ namespace TA.Controllers
         public async Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest)
         {
             return await _service.GetTestDescriptionsForReview(paginationRequest);
+        }
+
+        [Authorize]
+        [HttpPost("getbyimmutableid")]
+        public async Task<AssisgnedTestResponseDto> GetAssignmentByImmutableId(Guid immutableId)
+        {
+            return await _service.GetAssignmentByImmutableId(immutableId);
         }
     }
 }
