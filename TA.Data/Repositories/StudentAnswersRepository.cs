@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Common.Constants;
+using Common.Dto;
+using Common.Extensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +15,7 @@ namespace TA.Data.Repositories
     public interface IStudentAnswersRepository
     {
         public Task<List<Guid>> GetCompletedTests(Guid userId);
+        public Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest);
         public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
         public Task<bool> CheckForAssignmentCompletion(List<Guid> userIds, Guid assignmentImmutableId);
     }
@@ -36,10 +40,23 @@ namespace TA.Data.Repositories
             {
                 Answers = dto.Tasks,
                 AssignedTestImmutableId = dto.AssignedTestImmutableId,
-                UserId = userId
+                UserId = userId,
+                StudentAnswerState = StudentAnswerState.OnReview
             });
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest)
+        {
+            return await _context.StudentAnswers.Where(a => a.AssignedTestImmutableId == paginationRequest.Request &&
+            a.StudentAnswerState == StudentAnswerState.OnReview).Select(a=>new TestsForReviewResponseDto()
+            {
+                Id = a.Id,
+                Answers = a.Answers,
+                AssignedTestImmutableId = a.AssignedTestImmutableId,  
+                UserId = a.UserId,
+            }).PaginateResult(paginationRequest);
         }
 
         public async Task<bool> CheckForAssignmentCompletion(List<Guid> userIds, Guid assignmentImmutableId)

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Common.Constants;
+using System.ComponentModel.DataAnnotations.Schema;
 using TA.Data.Contracts.Dto;
 
 namespace TA.Data.Contracts.Entities
@@ -10,5 +11,7 @@ namespace TA.Data.Contracts.Entities
         public Guid UserId { get; set; }
         [Column(TypeName = "jsonb")]
         public List<Answer> Answers {  get; set; }
+
+        public StudentAnswerState StudentAnswerState { get; set; }
     }
 }

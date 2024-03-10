@@ -48,5 +48,12 @@ namespace TA.Controllers
 
             await _service.SaveAnswers(dto, userId);
         }
+
+        [Authorize]
+        [HttpPost("reviewdescriptions")]
+        public async Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest)
+        {
+            return await _service.GetTestDescriptionsForReview(paginationRequest);
+        }
     }
 }

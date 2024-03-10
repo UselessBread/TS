@@ -74,7 +74,8 @@ namespace TA.Data.Repositories
                 DueTo = r.DueTo,
                 TestDescriptionId = r.TestDescriptionId,
                 TeacherId = r.AssignedBy,
-                AssignmentImmutableId = r.ImmutableId
+                AssignmentImmutableId = r.ImmutableId,
+                State = r.State
             })
                 .PaginateResult(request);
         }

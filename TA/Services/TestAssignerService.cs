@@ -12,6 +12,7 @@ namespace TA.Services
     {
         public Task AssignTest(AssignTestRequestDto dto, Guid userId);
         public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(Guid userId, PaginationRequest request);
+        public Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest);
         public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
     }
 
@@ -45,6 +46,11 @@ namespace TA.Services
             var completedTests = await _studentAnswersRepository.GetCompletedTests(userId);
 
             return await _assignmentRepository.GetAssignedTests(res, userId, request, completedTests);
+        }
+
+        public async Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest)
+        {
+            return await _studentAnswersRepository.GetTestDescriptionsForReview(paginationRequest);
         }
 
         // TODO: Add more checks for answers to be right according to the test types
