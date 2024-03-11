@@ -59,7 +59,7 @@ namespace TA.Controllers
 
         [Authorize]
         [HttpPost("getbyimmutableid")]
-        public async Task<AssisgnedTestResponseDto> GetAssignmentByImmutableId(Guid immutableId)
+        public async Task<AssisgnedTestResponseDto> GetAssignmentByImmutableId([FromBody]Guid immutableId)
         {
             return await _service.GetAssignmentByImmutableId(immutableId);
         }
