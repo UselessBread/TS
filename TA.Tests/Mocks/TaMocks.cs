@@ -27,6 +27,13 @@ namespace TA.Tests.Mocks
             clientMock.Setup(m => m.GetGroupsForUser(It.Is<Guid>(a => a == DbMockConstants.FirstStudentImmutableId)))
                 .Returns(Task.FromResult(new List<Guid> { DbMockConstants.FirstGroupImmutableId }));
 
+            clientMock.Setup(m => m.GetGroupInfoById(It.Is<Guid>(a => a == DbMockConstants.FirstGroupImmutableId)))
+                .Returns(Task.FromResult(new IdentityService.Data.Contracts.DTO.GetGroupInfoResponseDto
+                {
+                    GroupName = "",
+                    StudentIds = new List<Guid> { DbMockConstants.FirstStudentImmutableId }
+                }));
+
             return clientMock;
         }
     }
