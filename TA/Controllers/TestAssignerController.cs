@@ -63,5 +63,12 @@ namespace TA.Controllers
         {
             return await _service.GetAssignmentByImmutableId(immutableId);
         }
+
+        [Authorize(Roles = "Teacher")]
+        [HttpPost("savereview")]
+        public async Task SaveReview(AssignedTestReviewSaveRequestDto requestDto)
+        {
+            await _service.SaveReview(requestDto);
+        }
     }
 }

@@ -15,21 +15,30 @@ namespace TA.Services
         public Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest);
         public Task<AssisgnedTestResponseDto> GetAssignmentByImmutableId(Guid immutableId);
         public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
+        public Task SaveReview(AssignedTestReviewSaveRequestDto requestDto);
     }
 
     public class TestAssignerService : ITestAssignerService
     {
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IStudentAnswersRepository _studentAnswersRepository;
+        private readonly IReviewRepository _reviewRepository;
         private readonly ITAClient _client;
 
         public TestAssignerService(ITAClient client,
                                    IAssignmentRepository assignmentRepository,
-                                   IStudentAnswersRepository studentAnswersRepository)
+                                   IStudentAnswersRepository studentAnswersRepository,
+                                   IReviewRepository reviewRepository)
         {
             _client = client;
             _assignmentRepository = assignmentRepository;
             _studentAnswersRepository = studentAnswersRepository;
+            _reviewRepository = reviewRepository;
+        }
+
+        public async Task SaveReview(AssignedTestReviewSaveRequestDto requestDto)
+        {
+            await _reviewRepository.SaveReview(requestDto);
         }
 
         public async Task AssignTest(AssignTestRequestDto dto, Guid userId)
@@ -101,7 +110,6 @@ namespace TA.Services
             {
                 await _assignmentRepository.ChangeState(assignment, Common.Constants.AssignedTestState.OnReview);
             }
-
         }
     }
 }
