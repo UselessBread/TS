@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TA.Data.Contracts.Dto;
+﻿using TA.Data.Contracts.Dto;
 using TA.Data.Contracts.Entities;
 
 namespace TA.Data.Repositories
 {
+    /// <summary>
+    /// Respository for working with Review table
+    /// </summary>
     public interface IReviewRepository
     {
+        /// <summary>
+        /// Save review(comments) of a student's answer
+        /// </summary>
+        /// <param name="requestDto">comments with metadata</param>
+        /// <returns></returns>
         public Task SaveReview(AssignedTestReviewSaveRequestDto requestDto);
     }
     public class ReviewRepository: IReviewRepository
@@ -20,6 +23,7 @@ namespace TA.Data.Repositories
             _context = context;
         }
 
+        /// <inheritdoc/>
         public async Task SaveReview(AssignedTestReviewSaveRequestDto requestDto)
         {
             AssignedTestReview review = new AssignedTestReview
@@ -29,6 +33,7 @@ namespace TA.Data.Repositories
                 FinalComment = requestDto.FinalComment,
                 StudentAnswerId = requestDto.StudentAnswerId
             };
+            _context.Review.Add(review);
 
             await _context.SaveChangesAsync();
         }

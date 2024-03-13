@@ -13,9 +13,23 @@ using TA.Data.Contracts.Entities;
 
 namespace TA.Data.Repositories
 {
+    /// <summary>
+    /// Repository for working with StudentAnswers table
+    /// </summary>
     public interface IStudentAnswersRepository
     {
+        /// <summary>
+        /// Get submitted StudentAnswers for user 
+        /// </summary>
+        /// <param name="userId">id of the student</param>
+        /// <returns>list of immutablle ids of submitted StudentAnswers</returns>
         public Task<List<Guid>> GetCompletedTests(Guid userId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="paginationRequest"></param>
+        /// <returns></returns>
         public Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest);
         public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
         public Task<bool> CheckForAssignmentCompletion(List<Guid> userIds, Guid assignmentImmutableId);
