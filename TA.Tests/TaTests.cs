@@ -21,7 +21,8 @@ namespace TA.Tests
             AssignedTestsContext obj = mock.Object;
             AssignmentRepository assignmentRepository = new AssignmentRepository(obj);
             StudentAnswersRepository studentAnswersRepository = new StudentAnswersRepository(obj);
-            _service = new TestAssignerService(mocks.CreateClientMock().Object, assignmentRepository, studentAnswersRepository);
+            ReviewRepository reviewRepository = new ReviewRepository(obj);
+            _service = new TestAssignerService(mocks.CreateClientMock().Object, assignmentRepository, studentAnswersRepository, reviewRepository);
         }
 
         [Fact]
