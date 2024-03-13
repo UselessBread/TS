@@ -19,6 +19,7 @@ namespace TA.Data.Repositories
         public Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(List<Guid>? groups, Guid userId, PaginationRequest request, List<Guid> completedTests);
         public Task<AssignedTests> GetByImmutableId(Guid immutableId);
         public Task ChangeState(AssignedTests entity, AssignedTestState state);
+        public Task ChangeState(Guid immutableId, AssignedTestState state);
     }
     public class AssignmentRepository : IAssignmentRepository
     {
@@ -85,6 +86,12 @@ namespace TA.Data.Repositories
         {
             return await _context.AssignedTests.FirstOrDefaultAsync(a => a.ImmutableId == immutableId && a.DeletionDate == null)
                 ?? throw new EntityNotFoundException($"Cannot find AssignedTests entity with ImmutableId = {immutableId}");
+        }
+
+        public async Task ChangeState(Guid immutableId, AssignedTestState state)
+        {
+            var res = await GetByImmutableId(immutableId);
+            await ChangeState(res, state);
         }
 
         public async Task ChangeState(AssignedTests entity, AssignedTestState state)

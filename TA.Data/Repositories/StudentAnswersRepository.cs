@@ -1,5 +1,6 @@
 ﻿using Common.Constants;
 using Common.Dto;
+using Common.Exceptions;
 using Common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,6 +19,9 @@ namespace TA.Data.Repositories
         public Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest);
         public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
         public Task<bool> CheckForAssignmentCompletion(List<Guid> userIds, Guid assignmentImmutableId);
+        public Task UpdateState(int id, StudentAnswerState requiredState);
+        public Task<List<StudentAnswer>> GetAllByAssignmentImmutableId(Guid assignmentImmutableId);
+
     }
     public class StudentAnswersRepository : IStudentAnswersRepository
     {
@@ -25,6 +29,15 @@ namespace TA.Data.Repositories
         public StudentAnswersRepository(AssignedTestsContext context)
         {
             _context = context;
+        }
+
+        public async Task UpdateState(int id, StudentAnswerState requiredState)
+        {
+            StudentAnswer res = _context.StudentAnswers.FirstOrDefault(a => a.Id == id)
+                ?? throw new EntityNotFoundException($"StudentAnswer with id = {id} was not found");
+            res.StudentAnswerState = requiredState;
+
+            await _context.SaveChangesAsync();
         }
         public async Task<List<Guid>> GetCompletedTests(Guid userId)
         {
@@ -66,5 +79,11 @@ namespace TA.Data.Repositories
 
             return res == userIds.Count;
         }
+
+        public async Task<List<StudentAnswer>> GetAllByAssignmentImmutableId(Guid assignmentImmutableId)
+        {
+            return await _context.StudentAnswers.Where(a => a.AssignedTestImmutableId == assignmentImmutableId).ToListAsync();
+        }
+
     }
 }

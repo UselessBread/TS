@@ -1,4 +1,5 @@
-﻿using Common.Dto;
+﻿using Common.Constants;
+using Common.Dto;
 using Common.Exceptions;
 using IdentityService.Data.Contracts.DTO;
 using TA.Data.Contracts.Dto;
@@ -39,11 +40,19 @@ namespace TA.Services
         public async Task SaveReview(AssignedTestReviewSaveRequestDto requestDto)
         {
             await _reviewRepository.SaveReview(requestDto);
+            // update state of the answer
+            await _studentAnswersRepository.UpdateState(requestDto.StudentAnswerId, StudentAnswerState.Reviewed);
+            // if no more answers to review, change state of the assignment
+            // find all answers for the assignment
+            List<StudentAnswer> res = await _studentAnswersRepository.GetAllByAssignmentImmutableId(requestDto.AssignedTestImmutableId);
+            // if they are all reviewed, change state of the assignment
+            if (res.All(a => a.StudentAnswerState == StudentAnswerState.Reviewed))
+                await _assignmentRepository.ChangeState(requestDto.AssignedTestImmutableId, AssignedTestState.Reviewed);
         }
 
         public async Task AssignTest(AssignTestRequestDto dto, Guid userId)
         {
-            if(dto.GroupImmutableId == null && dto.StudentImmutableId == null)
+            if (dto.GroupImmutableId == null && dto.StudentImmutableId == null)
             {
                 throw new BadRequestException("group or student must be assigned");
             }
@@ -85,7 +94,7 @@ namespace TA.Services
             int position = -1;
             foreach (var answer in orederdAnswers)
             {
-                if(answer.Position == position + 1)
+                if (answer.Position == position + 1)
                 {
                     position = answer.Position;
                 }

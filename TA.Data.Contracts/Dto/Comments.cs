@@ -3,6 +3,6 @@
     public class Comments
     {
         public required int Position {  get; set; }
-        public required List<string> Comment { get; set; }
+        public required string Comment { get; set; }
     }
 }
