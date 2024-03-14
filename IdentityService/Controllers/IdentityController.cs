@@ -32,7 +32,6 @@ namespace IdentityService.Controllers
             return await _userService.SignIn(dto);
         }
 
-        //[Authorize(Roles = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("getallgroups")]
         public async Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroups(PaginationRequest paginationRequest)
         {
