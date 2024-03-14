@@ -18,7 +18,7 @@ namespace TA.Services
         /// Assigns test for a gruop or a selected individual
         /// </summary>
         /// <param name="dto">request</param>
-        /// <param name="userId">id of the user, who sends request</param>
+        /// <param name="userId">id of the user, who assignes test</param>
         /// <returns></returns>
         public Task AssignTest(AssignTestRequestDto dto, Guid userId);
 
@@ -60,6 +60,9 @@ namespace TA.Services
         public Task SaveReview(AssignedTestReviewSaveRequestDto requestDto);
     }
 
+    /// <summary>
+    /// Basic all-purpose service for controller
+    /// </summary>
     public class TestAssignerService : ITestAssignerService
     {
         private readonly IAssignmentRepository _assignmentRepository;

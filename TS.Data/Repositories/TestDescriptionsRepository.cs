@@ -7,16 +7,64 @@ using TS.Data.Contracts.Entities;
 
 namespace TS.Data.Repositories
 {
+    /// <summary>
+    /// Repository for TestDescriptions table
+    /// </summary>
     public interface ITestDescriptionsRepository
     {
+        /// <summary>
+        /// Create new TestDescription
+        /// </summary>
+        /// <param name="contentId">id of the TestContent</param>
+        /// <param name="testContentImmutableId">immutable id of the testContent</param>
+        /// <param name="dto">additional info about test descripton</param>
+        /// <param name="userId">id of the creator</param>
+        /// <returns></returns>
         public Task Create(int contentId, Guid testContentImmutableId, CreateNewTestDto dto, Guid userId);
+
+        /// <summary>
+        /// Get testDescription by immutableId
+        /// </summary>
+        /// <param name="immutableId">ImmutableId of the TestDescription</param>
+        /// <returns></returns>
         public Task<TestDescriptions> GetByimmutableId(Guid immutableId);
+
+        /// <summary>
+        /// Delete TestDescription
+        /// </summary>
+        /// <param name="entity">Entity to delete</param>
+        /// <returns></returns>
         public Task Delete(TestDescriptions entity);
+
+        /// <summary>
+        /// Update testDescription
+        /// </summary>
+        /// <param name="entity">Entity to update</param>
+        /// <param name="contentId">id of the testContent</param>
+        /// <param name="contentImmutableId">ImmutableId of the TestContent</param>
+        /// <param name="testName">Name of the test</param>
+        /// <returns></returns>
         public Task Update(TestDescriptions entity, int contentId, Guid contentImmutableId, string testName);
+
+        /// <summary>
+        /// Get all TestDescriptions, that were created by a specified user
+        /// </summary>
+        /// <param name="userId">Creator's id</param>
+        /// <param name="paginationRequest">pagination info</param>
+        /// <returns>paginated result</returns>
         public Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(Guid userId, PaginationRequest paginationRequest);
+
+        /// <summary>
+        /// get testDescription by id
+        /// </summary>
+        /// <param name="id">TestDescription's Id</param>
+        /// <returns></returns>
         public Task<TestDescriptions> GetById(int id);
     }
 
+    /// <summary>
+    /// Repository for TestDescriptions table
+    /// </summary>
     public class TestDescriptionsRepository : ITestDescriptionsRepository
     {
         private readonly TestsContext _context;
@@ -26,6 +74,7 @@ namespace TS.Data.Repositories
             _context = context;
         }
 
+        /// <inheritdoc/>
         public async Task Create(int contentId, Guid testContentImmutableId, CreateNewTestDto dto, Guid userId)
         {
             TestDescriptions testDescription = new TestDescriptions
@@ -43,6 +92,7 @@ namespace TS.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<TestDescriptions> GetByimmutableId(Guid immutableId)
         {
             return await _context.TestDescriptions.FirstOrDefaultAsync(d => d.ImmutableId == immutableId
@@ -50,12 +100,14 @@ namespace TS.Data.Repositories
                     throw new EntityNotFoundException($"No TestDescriptions with ImmutableId = {immutableId} was found");
         }
 
+        /// <inheritdoc/>
         public async Task Delete(TestDescriptions entity)
         {
             entity.DeletionDate = DateTime.Now.ToUniversalTime();
             await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc/>
         public async Task Update(TestDescriptions entity, int contentId, Guid contentImmutableId, string testName)
         {
             DateTime creatonTime = DateTime.Now.ToUniversalTime();
@@ -76,6 +128,7 @@ namespace TS.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(Guid userId, PaginationRequest paginationRequest)
         {
             IQueryable<TestDescriptions> resQuery = _context.TestDescriptions
@@ -84,6 +137,7 @@ namespace TS.Data.Repositories
             return await resQuery.PaginateResult(paginationRequest);
         }
 
+        /// <inheritdoc/>
         public async Task<TestDescriptions> GetById(int id)
         {
             return await _context.TestDescriptions.FirstOrDefaultAsync(d => d.Id == id) ??

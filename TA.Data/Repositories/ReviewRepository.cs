@@ -15,6 +15,10 @@ namespace TA.Data.Repositories
         /// <returns></returns>
         public Task SaveReview(AssignedTestReviewSaveRequestDto requestDto);
     }
+
+    /// <summary>
+    /// Respository for working with Review table
+    /// </summary>
     public class ReviewRepository: IReviewRepository
     {
         private readonly AssignedTestsContext _context;

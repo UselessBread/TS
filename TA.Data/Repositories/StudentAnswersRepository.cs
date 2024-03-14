@@ -3,11 +3,6 @@ using Common.Dto;
 using Common.Exceptions;
 using Common.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TA.Data.Contracts.Dto;
 using TA.Data.Contracts.Entities;
 
@@ -26,17 +21,48 @@ namespace TA.Data.Repositories
         public Task<List<Guid>> GetCompletedTests(Guid userId);
 
         /// <summary>
-        /// 
+        /// Get student answers by AssignedTestImmutableId
         /// </summary>
-        /// <param name="paginationRequest"></param>
-        /// <returns></returns>
+        /// <param name="paginationRequest">request with AssignedTestImmutableId</param>
+        /// <returns>paginated result of <see cref="TestsForReviewResponseDto"/</returns>
         public Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest);
+
+        /// <summary>
+        /// Save user answers as a StudentAnswer
+        /// </summary>
+        /// <param name="dto">answers with metadata</param>
+        /// <param name="userId">user, who send answers</param>
+        /// <returns></returns>
         public Task SaveAnswers(SaveAnswersDto dto, Guid userId);
+
+        /// <summary>
+        /// Find out if all users, that have been provided, completed the assignment
+        /// </summary>
+        /// <param name="userIds">users to check</param>
+        /// <param name="assignmentImmutableId">ImmutableId of the assignment</param>
+        /// <returns>true if completed</returns>
         public Task<bool> CheckForAssignmentCompletion(List<Guid> userIds, Guid assignmentImmutableId);
+
+        /// <summary>
+        /// Update the state of the StudentAnswer
+        /// </summary>
+        /// <param name="id">Id of the answer</param>
+        /// <param name="requiredState">requred state that assignment must have</param>
+        /// <returns></returns>
         public Task UpdateState(int id, StudentAnswerState requiredState);
+
+        /// <summary>
+        /// Get all StudentAnswers by the assignmentImmutableId
+        /// </summary>
+        /// <param name="assignmentImmutableId">Immutable id of the assignment</param>
+        /// <returns></returns>
         public Task<List<StudentAnswer>> GetAllByAssignmentImmutableId(Guid assignmentImmutableId);
 
     }
+
+    /// <summary>
+    /// Repository for working with StudentAnswers table
+    /// </summary>
     public class StudentAnswersRepository : IStudentAnswersRepository
     {
         private readonly AssignedTestsContext _context;
@@ -45,6 +71,7 @@ namespace TA.Data.Repositories
             _context = context;
         }
 
+        /// <inheritdoc/>
         public async Task UpdateState(int id, StudentAnswerState requiredState)
         {
             StudentAnswer res = _context.StudentAnswers.FirstOrDefault(a => a.Id == id)
@@ -53,6 +80,8 @@ namespace TA.Data.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        /// <inheritdoc/>
         public async Task<List<Guid>> GetCompletedTests(Guid userId)
         {
             return await _context.StudentAnswers
@@ -61,6 +90,7 @@ namespace TA.Data.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc/>
         public async Task SaveAnswers(SaveAnswersDto dto, Guid userId)
         {
             _context.StudentAnswers.Add(new StudentAnswer
@@ -74,6 +104,7 @@ namespace TA.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<PaginatedResponse<TestsForReviewResponseDto>> GetTestDescriptionsForReview(PaginationRequest<Guid> paginationRequest)
         {
             return await _context.StudentAnswers.Where(a => a.AssignedTestImmutableId == paginationRequest.Request &&
@@ -86,6 +117,7 @@ namespace TA.Data.Repositories
             }).PaginateResult(paginationRequest);
         }
 
+        /// <inheritdoc/>
         public async Task<bool> CheckForAssignmentCompletion(List<Guid> userIds, Guid assignmentImmutableId)
         {
             var res = await _context.StudentAnswers.Where(a => userIds.Contains(a.UserId)
@@ -94,6 +126,7 @@ namespace TA.Data.Repositories
             return res == userIds.Count;
         }
 
+        /// <inheritdoc/>
         public async Task<List<StudentAnswer>> GetAllByAssignmentImmutableId(Guid assignmentImmutableId)
         {
             return await _context.StudentAnswers.Where(a => a.AssignedTestImmutableId == assignmentImmutableId).ToListAsync();
