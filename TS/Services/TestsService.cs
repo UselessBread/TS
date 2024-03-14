@@ -7,15 +7,59 @@ using TS.Data.Repositories;
 
 namespace TS.Services
 {
+    /// <summary>
+    /// Basic service for controller
+    /// </summary>
     public interface ITestsService
     {
+        /// <summary>
+        /// Creates new test
+        /// </summary>
+        /// <param name="dto">dto with test's description</param>
+        /// <param name="userId">Id of the creator</param>
+        /// <returns></returns>
         public Task CreateNewTest(CreateNewTestDto dto, Guid userId);
+
+        /// <summary>
+        /// Get all TestDescriptions, created by specified user
+        /// </summary>
+        /// <param name="paginationRequest">pagination info</param>
+        /// <param name="userId">Id of the creator</param>
+        /// <returns>paginated response</returns>
         public Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(PaginationRequest paginationRequest, Guid userId);
+
+        /// <summary>
+        /// Get TestContent by ImmutableId of the TestDescription
+        /// </summary>
+        /// <param name="testDescriptionImmutableId">ImmutableId of the TestDescription</param>
+        /// <returns>found TestContent</returns>
         public Task<TestsContent> GetTestContentByDescriptionsImmutableId([FromQuery] Guid testDescriptionImmutableId);
+
+        /// <summary>
+        /// Get TestContent by Id of the TestDescription
+        /// </summary>
+        /// <param name="taskDescriptionId">Id of the TestDescription</param>
+        /// <returns>Found TestContent</returns>
         public Task<TestsContent> GetTestContentByDescriptionsId([FromQuery] int taskDescriptionId);
+
+        /// <summary>
+        /// Get TestDescription by Id
+        /// </summary>
+        /// <param name="testDescriptionId">Id of the TestDescription</param>
+        /// <returns>Found TestDescription</returns>
         public Task<TestDescriptions> GetTestDescriptionById([FromQuery] int testDescriptionId);
+
+        /// <summary>
+        /// Update whole test (description and content)
+        /// </summary>
+        /// <param name="dto">New information to update</param>
+        /// <returns></returns>
         public Task Update(UpdateTestDto dto);
     }
+
+    /// <summary>
+    /// Basic service for controller
+    /// </summary>
     public class TestsService : ITestsService
     {
         private readonly ILogger<TestsService> _logger;
@@ -30,6 +74,7 @@ namespace TS.Services
         }
 
 
+        /// <inheritdoc/>
         public async Task CreateNewTest(CreateNewTestDto dto, Guid userId)
         {
             ValidateTasks(dto.Tasks);
@@ -38,28 +83,33 @@ namespace TS.Services
             await _testsDescriptionsRepository.Create(res.Id, res.ImmutableId, dto, userId);
         }
 
+        /// <inheritdoc/>
         public async Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(PaginationRequest paginationRequest, Guid userId)
         {
             return await _testsDescriptionsRepository.GetAllDescriptions(userId, paginationRequest);
         }
 
+        /// <inheritdoc/>
         public async Task<TestsContent> GetTestContentByDescriptionsImmutableId([FromQuery] Guid testDescriptionImmutableId)
         {
             var description = await _testsDescriptionsRepository.GetByimmutableId(testDescriptionImmutableId);
             return await _testsContentRepository.GetByImmutableId(description.TestContentImmutableId);
         }
 
+        /// <inheritdoc/>
         public async Task<TestsContent> GetTestContentByDescriptionsId([FromQuery] int taskDescriptionId)
         {
             var description = await _testsDescriptionsRepository.GetById(taskDescriptionId);
             return await _testsContentRepository.GetById(description.TestContentId);
         }
 
+        /// <inheritdoc/>
         public async Task<TestDescriptions> GetTestDescriptionById([FromQuery] int testDescriptionId)
         {
             return await _testsDescriptionsRepository.GetById(testDescriptionId);
         }
 
+        /// <inheritdoc/>
         public async Task Update(UpdateTestDto dto)
         {
             ValidateTasks(dto.Tasks);
@@ -70,6 +120,11 @@ namespace TS.Services
             await _testsDescriptionsRepository.Update(existingDescription, updatedContent.Id, updatedContent.ImmutableId, dto.TestName);
         }
 
+        /// <summary>
+        /// Validates Tasks of the created/updated test
+        /// </summary>
+        /// <param name="tasks">tasks to validate</param>
+        /// <exception cref="InvalidContentException">if position is not incremented by 1 or if metadata for tasks is wrong</exception>
         private void ValidateTasks(List<TaskDto> tasks)
         {
             var orderedTasks = tasks.OrderBy(t => t.Position);

@@ -81,6 +81,7 @@ namespace TA.Services
             _reviewRepository = reviewRepository;
         }
 
+        /// <inheritdoc/>
         public async Task SaveReview(AssignedTestReviewSaveRequestDto requestDto)
         {
             await _reviewRepository.SaveReview(requestDto);
@@ -161,12 +162,12 @@ namespace TA.Services
                 GetGroupInfoResponseDto groupInfo = await _client.GetGroupInfoById(assignment.GroupImmutableId.Value);
                 if (await _studentAnswersRepository.CheckForAssignmentCompletion(groupInfo.StudentIds, assignment.ImmutableId))
                 {
-                    await _assignmentRepository.ChangeState(assignment, Common.Constants.AssignedTestState.OnReview);
+                    await _assignmentRepository.ChangeState(assignment, AssignedTestState.OnReview);
                 }
             }
             else
             {
-                await _assignmentRepository.ChangeState(assignment, Common.Constants.AssignedTestState.OnReview);
+                await _assignmentRepository.ChangeState(assignment, AssignedTestState.OnReview);
             }
         }
     }
