@@ -30,17 +30,23 @@ namespace IdentityService.Services
     {
         private readonly UserManager<TsUser> _userManager;
         private readonly SignInManager<TsUser> _signInManager;
-        private readonly IUsersRepository _usersRepository;
+        private readonly IIdentityRepository _usersRepository;
+        private readonly IGroupsRepository _groupsRepository;
+        private readonly IStudentsByGroupsRepository _studentsByGroupsRepository;
         private readonly IConfiguration _config;
 
         public UserService(UserManager<TsUser> userManager,
                            SignInManager<TsUser> signInManager,
-                           IUsersRepository usersRepository,
+                           IIdentityRepository usersRepository,
+                           IGroupsRepository groupsRepository,
+                           IStudentsByGroupsRepository studentsByGroupsRepository,
                            IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _usersRepository = usersRepository;
+            _groupsRepository = groupsRepository;
+            _studentsByGroupsRepository = studentsByGroupsRepository;
             _config = config;
         }
 
@@ -126,12 +132,20 @@ namespace IdentityService.Services
 
         public async Task<PaginatedResponse<GetAllGroupsResponseDto>> GetAllGroups(PaginationRequest paginationRequest)
         {
-            return await _usersRepository.GetAllGroupsAsync(paginationRequest);
+            return await _groupsRepository.GetAllGroupsAsync(paginationRequest);
         }
 
         public async Task<GetGroupInfoResponseDto> GetGroupInfoById(Guid immutableId)
         {
-            return await _usersRepository.GetGroupInfoById(immutableId);
+            Groups group = await _groupsRepository.GetByImmutableId(immutableId);
+            List<Guid> studs = await _studentsByGroupsRepository.GetUsersInGroup(group.ImmutableId);
+
+            return new GetGroupInfoResponseDto
+            {
+                GroupName = group.Name,
+                StudentIds = studs,
+                TeacherId = group.TeacherId
+            };
         }
 
         public async Task<PaginatedResponse<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> paginationRequest)
@@ -141,12 +155,27 @@ namespace IdentityService.Services
 
         public async Task AddStudentsToGroup(AddStudentsToGroupRequest dto)
         {
-            await _usersRepository.AddStudentsToGroupAsync(dto);
+            if (!await _groupsRepository.IsExists(dto.GroupImmutableId))
+                throw new EntityNotFoundException("Such group does not exist");
+
+            await _studentsByGroupsRepository.AddStudentsToGroup(dto);
         }
 
         public async Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto)
         {
-            return await _usersRepository.CreateNewGroupAsync(dto);
+            if (!await _usersRepository.CheckIfHasRole(dto.TeacherId, UserConstants.RoleTeacher))
+                throw new BadRequestException("provided user was not teacher or does not exist");
+            return await _groupsRepository.CreateNewGroup(dto);
+        }
+
+        public async Task UpdateGroup(UpdateGroupRequestDto dto)
+        {
+            await _groupsRepository.UpdateGroup(dto);
+        }
+
+        public async Task<List<Guid>> GetGroupsForUser(Guid userId)
+        {
+            return await _studentsByGroupsRepository.GetGroupsForUser(userId);
         }
 
         private static void CheckIdentityResult(IdentityResult res)
@@ -162,16 +191,6 @@ namespace IdentityService.Services
 
                 throw new BadRequestException(stringBuilder.ToString());
             }
-        }
-
-        public async Task UpdateGroup(UpdateGroupRequestDto dto)
-        {
-            await _usersRepository.UpdateGroup(dto);
-        }
-
-        public async Task<List<Guid>> GetGroupsForUser(Guid userId)
-        {
-            return await _usersRepository.GetGroupsForUser(userId);
         }
     }
 }

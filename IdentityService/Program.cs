@@ -51,7 +51,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
+builder.Services.AddScoped<IGroupsRepository, GroupsRepository>();
+builder.Services.AddScoped<IStudentsByGroupsRepository, StudentsByGroupsRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
