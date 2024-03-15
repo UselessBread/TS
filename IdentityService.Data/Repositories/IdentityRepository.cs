@@ -87,7 +87,6 @@ namespace IdentityService.Data.Repositories
         /// <inheritdoc/>
         public async Task<bool> CheckIfHasRole(Guid userId, string roleName)
         {
-            // check for teacher
             if (!await _context.UserRoles.Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new
             {
                 UserId = ur.UserId,
