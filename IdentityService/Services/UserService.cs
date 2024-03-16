@@ -30,23 +30,29 @@ namespace IdentityService.Services
     {
         private readonly UserManager<TsUser> _userManager;
         private readonly SignInManager<TsUser> _signInManager;
-        private readonly IIdentityRepository _usersRepository;
+        private readonly IUserRolesRepository _identRep;
         private readonly IGroupsRepository _groupsRepository;
         private readonly IStudentsByGroupsRepository _studentsByGroupsRepository;
+        private readonly IRolesRepository _rolesRepository;
+        private readonly IUsersRepository _usersRepository;
         private readonly IConfiguration _config;
 
         public UserService(UserManager<TsUser> userManager,
                            SignInManager<TsUser> signInManager,
-                           IIdentityRepository usersRepository,
+                           IUserRolesRepository identRep,
                            IGroupsRepository groupsRepository,
                            IStudentsByGroupsRepository studentsByGroupsRepository,
+                           IRolesRepository rolesRepository,
+                           IUsersRepository usersRepository,
                            IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _usersRepository = usersRepository;
+            _identRep = identRep;
             _groupsRepository = groupsRepository;
             _studentsByGroupsRepository = studentsByGroupsRepository;
+            _rolesRepository = rolesRepository;
+            _usersRepository = usersRepository;
             _config = config;
         }
 
@@ -150,7 +156,10 @@ namespace IdentityService.Services
 
         public async Task<PaginatedResponse<FindUserResponseDto>> FindUser(PaginationRequest<FindRequestDto> paginationRequest)
         {
-            return await _usersRepository.FindUserAsync(paginationRequest);
+            IQueryable<IdentityRole<Guid>> roles = _rolesRepository.GetAllRolesAsQuery();
+            IQueryable<TsUser> users = _usersRepository.GetAllUsersAsQuery();
+
+            return await _identRep.FindUserAsync(paginationRequest, roles, users);
         }
 
         public async Task AddStudentsToGroup(AddStudentsToGroupRequest dto)
@@ -163,8 +172,10 @@ namespace IdentityService.Services
 
         public async Task<Guid> CreateNewGroupAsync(CreateNewGroupRequest dto)
         {
-            if (!await _usersRepository.CheckIfHasRole(dto.TeacherId, UserConstants.RoleTeacher))
+            IQueryable<IdentityRole<Guid>> roles = _rolesRepository.GetAllRolesAsQuery();
+            if (!await _identRep.CheckIfHasRole(dto.TeacherId, UserConstants.RoleTeacher, roles))
                 throw new BadRequestException("provided user was not teacher or does not exist");
+
             return await _groupsRepository.CreateNewGroup(dto);
         }
 

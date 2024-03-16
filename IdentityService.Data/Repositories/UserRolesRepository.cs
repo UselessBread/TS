@@ -2,6 +2,8 @@
 using Common.Exceptions;
 using Common.Extensions;
 using IdentityService.Data.Contracts.DTO;
+using IdentityService.Data.Contracts.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Data.Repositories
@@ -9,14 +11,14 @@ namespace IdentityService.Data.Repositories
     /// <summary>
     /// Repository for identity tables. Shitty solution
     /// </summary>
-    public interface IIdentityRepository
+    public interface IUserRolesRepository
     {
         /// <summary>
         /// Find user by a custom request
         /// </summary>
         /// <param name="paginationRequest">pagination request with a request for searching user</param>
         /// <returns>paginated response of found users</returns>
-        public Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest);
+        public Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest, IQueryable<IdentityRole<Guid>> roles, IQueryable<TsUser> users);
 
         /// <summary>
         /// Check if user has a role
@@ -24,23 +26,23 @@ namespace IdentityService.Data.Repositories
         /// <param name="userId">Id of the user to check</param>
         /// <param name="roleName">Name of the role that it shoud have</param>
         /// <returns>true if it has specified role</returns>
-        public Task<bool> CheckIfHasRole(Guid userId, string roleName);
+        public Task<bool> CheckIfHasRole(Guid userId, string roleName, IQueryable<IdentityRole<Guid>> roles);
     }
 
     /// <summary>
     /// Repository for identity tables. Shitty solution
     /// </summary>
-    public class IdentityRepository : IIdentityRepository
+    public class UserRolesRepository : IUserRolesRepository
     {
         private readonly UsersContext _context;
-        
-        public IdentityRepository(UsersContext context)
+
+        public UserRolesRepository(UsersContext context)
         {
             _context = context;
         }
 
         /// <inheritdoc/>
-        public async Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest)
+        public async Task<PaginatedResponse<FindUserResponseDto>> FindUserAsync(PaginationRequest<FindRequestDto> paginationRequest, IQueryable<IdentityRole<Guid>> roles, IQueryable<TsUser> users)
         {
             FindRequestDto requestDto = paginationRequest.Request;
             string roleToBeFound = string.Empty;
@@ -59,11 +61,11 @@ namespace IdentityService.Data.Repositories
                     throw new BadRequestException("Unsupported User type");
             }
 
-            var joinedTables = _context.UserRoles.Join(_context.Users, ur => ur.UserId, u => u.Id, (ur, u) => new
+            var joinedTables = _context.UserRoles.Join(users, ur => ur.UserId, u => u.Id, (ur, u) => new
             {
                 User = u,
                 RoleId = ur.RoleId,
-            }).Join(_context.Roles, res => res.RoleId, r => r.Id, (res, r) => new
+            }).Join(roles, res => res.RoleId, r => r.Id, (res, r) => new
             {
                 User = res.User,
                 Role = r
@@ -85,9 +87,9 @@ namespace IdentityService.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<bool> CheckIfHasRole(Guid userId, string roleName)
+        public async Task<bool> CheckIfHasRole(Guid userId, string roleName, IQueryable<IdentityRole<Guid>> roles)
         {
-            if (!await _context.UserRoles.Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new
+            if (!await _context.UserRoles.Join(roles, ur => ur.RoleId, r => r.Id, (ur, r) => new
             {
                 UserId = ur.UserId,
                 RoleName = r.Name
