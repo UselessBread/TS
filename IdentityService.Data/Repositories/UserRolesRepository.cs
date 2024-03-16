@@ -1,4 +1,5 @@
-﻿using Common.Dto;
+﻿using Common.Constants;
+using Common.Dto;
 using Common.Exceptions;
 using Common.Extensions;
 using IdentityService.Data.Contracts.DTO;
@@ -48,14 +49,14 @@ namespace IdentityService.Data.Repositories
             string roleToBeFound = string.Empty;
             switch (requestDto.UserType)
             {
-                case Common.Constants.UserTypes.Admin:
-                    roleToBeFound = "Admin";
+                case UserTypes.Admin:
+                    roleToBeFound = UserConstants.RoleAdmin;
                     break;
-                case Common.Constants.UserTypes.Teacher:
-                    roleToBeFound = "Teacher";
+                case UserTypes.Teacher:
+                    roleToBeFound = UserConstants.RoleTeacher;
                     break;
-                case Common.Constants.UserTypes.Student:
-                    roleToBeFound = "Student";
+                case UserTypes.Student:
+                    roleToBeFound = UserConstants.RoleStudent;
                     break;
                 default:
                     throw new BadRequestException("Unsupported User type");

@@ -1,13 +1,9 @@
 ﻿using Common.Constants;
 using Common.Dto;
-using Common.Exceptions;
 using Common.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using TA.Data.Contracts.Dto;
-using TA.Data.Contracts.Entities;
 using TA.Services;
 
 namespace TA.Controllers
@@ -24,7 +20,7 @@ namespace TA.Controllers
         }
 
         [HttpPost("assign")]
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = UserConstants.RoleTeacher)]
         public async Task AssignTest(AssignTestRequestDto dto)
         {
             Guid userId = JwtTokenHelpers.GetUserIdFromToken(Request);
@@ -64,7 +60,7 @@ namespace TA.Controllers
             return await _service.GetAssignmentByImmutableId(immutableId);
         }
 
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = UserConstants.RoleTeacher)]
         [HttpPost("savereview")]
         public async Task SaveReview(AssignedTestReviewSaveRequestDto requestDto)
         {

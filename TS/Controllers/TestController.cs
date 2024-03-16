@@ -1,4 +1,5 @@
-﻿using Common.Dto;
+﻿using Common.Constants;
+using Common.Dto;
 using Common.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ namespace TS.Controllers
             _testsService = testsService;
         }
 
-        [Authorize (Roles = "Admin, Teacher")]
+        [Authorize (Roles = $"{UserConstants.RoleAdmin}, {UserConstants.RoleTeacher}")]
         [HttpPost("create")]
         public async Task CreateNewTest(CreateNewTestDto dto)
         {
@@ -30,7 +31,7 @@ namespace TS.Controllers
         }
 
         //TODO: Use Pagination
-        [Authorize(Roles = "Admin, Teacher")]
+        [Authorize(Roles = $"{UserConstants.RoleAdmin}, {UserConstants.RoleTeacher}")]
         [HttpPost("descriptions")]
         public async Task<PaginatedResponse<TestDescriptions>> GetAllDescriptions(PaginationRequest paginationRequest)
         {
@@ -56,7 +57,7 @@ namespace TS.Controllers
             return await _testsService.GetTestDescriptionById(testDescriptionId);
         }
 
-        [Authorize(Roles = "Admin, Teacher")]
+        [Authorize(Roles = $"{UserConstants.RoleAdmin}, {UserConstants.RoleTeacher}")]
         [HttpPost("update")]
         public async Task Update(UpdateTestDto dto)
         {

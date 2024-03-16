@@ -1,4 +1,5 @@
-﻿using Common.Dto;
+﻿using Common.Constants;
+using Common.Dto;
 using IdentityService.Data.Contracts.DTO;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -18,7 +19,7 @@ namespace IdentityService.Controllers
             _userService = userService;
         }
 
-        [Authorize(Roles = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = UserConstants.RoleAdmin, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("create")]
         public async Task CreateUser([FromBody] CreateUserRequestDto request)
         {

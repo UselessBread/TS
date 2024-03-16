@@ -91,13 +91,13 @@ namespace IdentityService.Services
             switch (request.UserType)
             {
                 case UserTypes.Admin:
-                    res = await _userManager.AddToRoleAsync(createdUser, "Admin");
+                    res = await _userManager.AddToRoleAsync(createdUser, UserConstants.RoleAdmin);
                     break;
                 case UserTypes.Teacher:
-                    res = await _userManager.AddToRoleAsync(createdUser, "Teacher");
+                    res = await _userManager.AddToRoleAsync(createdUser, UserConstants.RoleTeacher);
                     break;
                 case UserTypes.Student:
-                    res = await _userManager.AddToRoleAsync(createdUser, "Student");
+                    res = await _userManager.AddToRoleAsync(createdUser, UserConstants.RoleStudent);
                     break;
                 default:
                     throw new BadRequestException("This role was not specified");

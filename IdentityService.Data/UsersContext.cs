@@ -1,4 +1,5 @@
-﻿using IdentityService.Data.Contracts.Entities;
+﻿using Common.Constants;
+using IdentityService.Data.Contracts.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -26,20 +27,20 @@ namespace IdentityService.Data
                 new IdentityRole<Guid>
                 {
                     Id = adminRoleId,
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
+                    Name = UserConstants.RoleAdmin,
+                    NormalizedName = UserConstants.RoleAdmin.ToUpper()
                 },
                 new IdentityRole<Guid>
                 {
                     Id = teacherRoleId,
-                    Name = "Teacher",
-                    NormalizedName = "TEACHER"
+                    Name = UserConstants.RoleTeacher,
+                    NormalizedName = UserConstants.RoleTeacher.ToUpper()
                 },
                 new IdentityRole<Guid>
                 {
                     Id = studentRoleId,
-                    Name = "Student",
-                    NormalizedName = "STUDENT"
+                    Name = UserConstants.RoleStudent,
+                    NormalizedName = UserConstants.RoleStudent.ToUpper()
                 }
             });
 
