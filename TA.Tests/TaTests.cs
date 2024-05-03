@@ -1,10 +1,7 @@
 using Common.Dto;
 using Common.Exceptions;
 using Common.MassTransit;
-using IdentityService.Data.Contracts.DTO;
-using MassTransit;
 using MassTransit.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TA.Data;
 using TA.Data.Contracts.Dto;
