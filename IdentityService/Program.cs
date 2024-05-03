@@ -1,13 +1,17 @@
 using Common.Web;
+using IdentityService.Consumers;
 using IdentityService.Data;
 using IdentityService.Data.Contracts.Entities;
 using IdentityService.Data.Repositories;
 using IdentityService.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using Serilog;
+using Serilog.Events;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,8 +61,39 @@ builder.Services.AddScoped<IStudentsByGroupsRepository, StudentsByGroupsReposito
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<GetGroupInfoByIdConsumer, GetGroupInfoByIdConsumerDefinition>();
+    x.AddConsumer<GetGroupsForUserConsumer, GetGroupsForUserConsumerDefinition>();
+
+    x.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host("localhost", 5672, "/", host =>
+        {
+            host.Username("admin");
+            host.Password("admin");
+        });
+
+        cfg.ConfigureEndpoints(ctx);
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Host.UseSerilog((host, log) =>
+{
+    if (host.HostingEnvironment.IsProduction())
+        log.MinimumLevel.Information();
+    else
+        log.MinimumLevel.Verbose();
+
+    log.MinimumLevel.Override("Microsoft", LogEventLevel.Warning);
+    log.MinimumLevel.Override("Quartz", LogEventLevel.Information);
+    log.WriteTo.Console();
+});
+
+
 
 var app = builder.Build();
 

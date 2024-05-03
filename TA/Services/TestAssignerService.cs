@@ -1,11 +1,12 @@
 ﻿using Common.Constants;
 using Common.Dto;
 using Common.Exceptions;
+using Common.MassTransit;
 using IdentityService.Data.Contracts.DTO;
+using MassTransit;
 using TA.Data.Contracts.Dto;
 using TA.Data.Contracts.Entities;
 using TA.Data.Repositories;
-using TA.RestClients;
 
 namespace TA.Services
 {
@@ -68,17 +69,20 @@ namespace TA.Services
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IStudentAnswersRepository _studentAnswersRepository;
         private readonly IReviewRepository _reviewRepository;
-        private readonly ITAClient _client;
+        private readonly IRequestClient<GetGroupInfoByIdRequestMessage> _getGroupInfoByIdRequestClient;
+        private readonly IRequestClient<GetGroupsForUserRequestMessage> _getGroupsForUserRequestClient;
 
-        public TestAssignerService(ITAClient client,
-                                   IAssignmentRepository assignmentRepository,
+        public TestAssignerService(IAssignmentRepository assignmentRepository,
                                    IStudentAnswersRepository studentAnswersRepository,
-                                   IReviewRepository reviewRepository)
+                                   IReviewRepository reviewRepository,
+                                   IRequestClient<GetGroupInfoByIdRequestMessage> getGroupInfoByIdRequestClient,
+                                   IRequestClient<GetGroupsForUserRequestMessage> getGroupsForUserRequestClient)
         {
-            _client = client;
             _assignmentRepository = assignmentRepository;
             _studentAnswersRepository = studentAnswersRepository;
             _reviewRepository = reviewRepository;
+            _getGroupInfoByIdRequestClient = getGroupInfoByIdRequestClient;
+            _getGroupsForUserRequestClient = getGroupsForUserRequestClient;
         }
 
         /// <inheritdoc/>
@@ -108,7 +112,12 @@ namespace TA.Services
         /// <inheritdoc/>
         public async Task<PaginatedResponse<AssisgnedTestResponseDto>> GetAssignedTests(Guid userId, PaginationRequest request)
         {
-            List<Guid>? res = await _client.GetGroupsForUser(userId);
+            var response = await _getGroupsForUserRequestClient.GetResponse<GetGroupsForUserResponseMessage>(new GetGroupsForUserRequestMessage
+            {
+                UserId = userId
+            });
+
+            List<Guid> res = response.Message.Groups;
             List<Guid> completedTests = await _studentAnswersRepository.GetCompletedTests(userId);
 
             return await _assignmentRepository.GetAssignedTests(res, userId, request, completedTests);
@@ -159,7 +168,13 @@ namespace TA.Services
 
             if (assignment.GroupImmutableId.HasValue)
             {
-                GetGroupInfoResponseDto groupInfo = await _client.GetGroupInfoById(assignment.GroupImmutableId.Value);
+                Response<GetGroupInfoResponseDto> response = await _getGroupInfoByIdRequestClient.GetResponse<GetGroupInfoResponseDto>(new GetGroupInfoByIdRequestMessage
+                {
+                    ImmutableId = assignment.GroupImmutableId.Value
+                });
+
+                GetGroupInfoResponseDto groupInfo = response.Message;
+
                 if (await _studentAnswersRepository.CheckForAssignmentCompletion(groupInfo.StudentIds, assignment.ImmutableId))
                 {
                     await _assignmentRepository.ChangeState(assignment, AssignedTestState.OnReview);

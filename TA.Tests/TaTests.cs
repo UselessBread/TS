@@ -22,7 +22,7 @@ namespace TA.Tests
             AssignmentRepository assignmentRepository = new AssignmentRepository(obj);
             StudentAnswersRepository studentAnswersRepository = new StudentAnswersRepository(obj);
             ReviewRepository reviewRepository = new ReviewRepository(obj);
-            _service = new TestAssignerService(mocks.CreateClientMock().Object, assignmentRepository, studentAnswersRepository, reviewRepository);
+            _service = new TestAssignerService(assignmentRepository, studentAnswersRepository, reviewRepository, null,null);
         }
 
         [Fact]
