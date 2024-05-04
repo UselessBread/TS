@@ -25,6 +25,17 @@ namespace TA.Tests.Mocks
             ServiceProvider provider = new ServiceCollection()
                 .AddMassTransitTestHarness(cfg =>
                 {
+                    cfg.UsingRabbitMq((ctx, conf) =>
+                    {
+                        conf.Host("localhost", 5672, "/", host =>
+                        {
+                            host.Username("admin");
+                            host.Password("admin");
+                        });
+
+                        conf.ConfigureEndpoints(ctx);
+                    });
+
                     cfg.AddHandler<GetGroupInfoByIdRequestMessage>(async ctx =>
                     {
                         if (ctx.Message.ImmutableId == DbMockConstants.FirstGroupImmutableId)
