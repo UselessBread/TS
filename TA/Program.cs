@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;Database=ta;Username=usr;Password=pwd")
+var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=localhost;Database=ta;Username=usr;Password=pwd")
     .EnableDynamicJson();
 var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<AssignedTestsContext>(options => options.UseNpgsql(dataSource));

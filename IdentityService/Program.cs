@@ -21,7 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;Database=identity;Username=usr;Password=pwd")
+var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=localhost;Database=identity;Username=usr;Password=pwd")
     .EnableDynamicJson();
 var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<UsersContext>(options => options.UseNpgsql(dataSource));

@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Have to use NpgsqlDataSourceBuilder in order to enable JSON mapping.
-var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=host.docker.internal;Database=ts;Username=usr;Password=pwd")
+var dataSourceBuilder = new NpgsqlDataSourceBuilder("Host=localhost;Database=ts;Username=usr;Password=pwd")
     .EnableDynamicJson();
 var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<TestsContext>(options => options.UseNpgsql(dataSource));
