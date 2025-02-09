@@ -19,8 +19,8 @@ namespace TS.Data.Repositories
         /// <param name="testContentImmutableId">immutable id of the testContent</param>
         /// <param name="dto">additional info about test descripton</param>
         /// <param name="userId">id of the creator</param>
-        /// <returns></returns>
-        public Task Create(int contentId, Guid testContentImmutableId, CreateNewTestDto dto, Guid userId);
+        /// <returns><see cref="Guid"/> of the newly created description</returns>
+        public Task<Guid> Create(int contentId, Guid testContentImmutableId, CreateNewTestDto dto, Guid userId);
 
         /// <summary>
         /// Get testDescription by immutableId
@@ -75,7 +75,7 @@ namespace TS.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task Create(int contentId, Guid testContentImmutableId, CreateNewTestDto dto, Guid userId)
+        public async Task<Guid> Create(int contentId, Guid testContentImmutableId, CreateNewTestDto dto, Guid userId)
         {
             TestDescriptions testDescription = new TestDescriptions
             {
@@ -90,6 +90,8 @@ namespace TS.Data.Repositories
 
             _context.TestDescriptions.Add(testDescription);
             await _context.SaveChangesAsync();
+
+            return testDescription.ImmutableId;
         }
 
         /// <inheritdoc/>

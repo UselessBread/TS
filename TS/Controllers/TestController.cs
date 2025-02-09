@@ -24,10 +24,10 @@ namespace TS.Controllers
 
         [Authorize (Roles = $"{UserConstants.RoleAdmin}, {UserConstants.RoleTeacher}")]
         [HttpPost("create")]
-        public async Task CreateNewTest(CreateNewTestDto dto)
+        public async Task<TestDescriptions> CreateNewTest(CreateNewTestDto dto)
         {
             Guid userId = JwtTokenHelpers.GetUserIdFromToken(Request);
-            await _testsService.CreateNewTest(dto, userId);
+            return await _testsService.CreateNewTest(dto, userId);
         }
 
         //TODO: Use Pagination

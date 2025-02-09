@@ -17,8 +17,8 @@ namespace TS.Services
         /// </summary>
         /// <param name="dto">dto with test's description</param>
         /// <param name="userId">Id of the creator</param>
-        /// <returns></returns>
-        public Task CreateNewTest(CreateNewTestDto dto, Guid userId);
+        /// <returns><see cref="TestDescriptions"/>Description of the newly created Test</returns>
+        public Task<TestDescriptions> CreateNewTest(CreateNewTestDto dto, Guid userId);
 
         /// <summary>
         /// Get all TestDescriptions, created by specified user
@@ -75,12 +75,13 @@ namespace TS.Services
 
 
         /// <inheritdoc/>
-        public async Task CreateNewTest(CreateNewTestDto dto, Guid userId)
+        public async Task<TestDescriptions> CreateNewTest(CreateNewTestDto dto, Guid userId)
         {
             ValidateTasks(dto.Tasks);
             Guid immutableId = await _testsContentRepository.Create(dto.Tasks);
             TestsContent res = await _testsContentRepository.GetByImmutableId(immutableId);
-            await _testsDescriptionsRepository.Create(res.Id, res.ImmutableId, dto, userId);
+            Guid testDescriptionGuid = await _testsDescriptionsRepository.Create(res.Id, res.ImmutableId, dto, userId);
+            return await _testsDescriptionsRepository.GetByimmutableId(testDescriptionGuid);
         }
 
         /// <inheritdoc/>
